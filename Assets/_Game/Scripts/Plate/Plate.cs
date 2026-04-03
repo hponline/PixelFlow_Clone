@@ -9,7 +9,7 @@ public class Plate : MonoBehaviour
     [SerializeField] private Transform mountPoint;
 
     PlatePool platePool;
-    Turret curretTurret;
+    Turret currentTurret;
     Vector3 startPos = Vector3.zero;
     Quaternion startRot = Quaternion.identity;
 
@@ -26,10 +26,12 @@ public class Plate : MonoBehaviour
         DOTween.Kill(transform);
 
         Vector3 splineStartPos = (Vector3)spline.GetPoint(0).position;
-        transform.DOMove(splineStartPos, 1f)
+        transform.DOMove(splineStartPos, 0.4f)
             .SetEase(Ease.InOutQuad)
             .OnComplete(() =>
             {
+                transform.localRotation = Quaternion.Euler(0, 90, 0);
+                transform.localScale = Vector3.one;
 
                 follower.spline = spline;
                 follower.followSpeed = speed;
@@ -44,39 +46,51 @@ public class Plate : MonoBehaviour
     private void MountTurret(Turret turret) // turret üzerinde mermi varken plate ile beraber dönüyor- bug
     {
         turret.SetPlate(this);
-        curretTurret = turret;
+        currentTurret = turret;
         turret.transform.SetParent(mountPoint);
         turret.transform.localPosition = Vector3.zero;
         turret.transform.localRotation = Quaternion.identity;
         turret.enabled = true;
     }
 
-    public void RecallPlate() // Turret mermi bitince plate geri dönüyor
+    private void OnEnd(double percent)
     {
-        if (curretTurret != null)
+        follower.onEndReached -= OnEnd;
+
+        if(currentTurret != null)
         {
-            curretTurret.transform.SetParent(null);
-            LeanPool.Despawn(curretTurret);
-            curretTurret = null;
+            currentTurret.transform.SetParent(null);
+            //LeanPool.Despawn(currentTurret); // þimdilik despawn - turret için ayrý yer yapýlacak
+            currentTurret.SendToSlot();
+            currentTurret = null;
+        }
+
+        ReturnToStart();
+    }
+
+    public void RecallPlate()
+    {
+        if (currentTurret != null)
+        {
+            //currentTurret.transform.SetParent(null);
+            //currentTurret.SendToSlot();
+            //LeanPool.Despawn(currentTurret);  // Turret Slota gönder
+            currentTurret = null;
         }
         ReturnToStart();
     }
 
-    private void OnEnd(double percent) // plate - spline bitince döner
-    {
-        ReturnToStart();
-    }
-    void ReturnToStart() // scene sahnesinde geri dönerken spline üzerinde kalýyor. 
+    void ReturnToStart()
     {
         follower.enabled = false;
         follower.onEndReached -= OnEnd;
         follower.spline = null;
 
-        transform.DOMove(startPos, 1f)
+        transform.DOMove(startPos, 0.4f)
             .SetEase(Ease.InOutQuad)
             .OnComplete(() =>
             {
-                transform.SetLocalPositionAndRotation(startPos, startRot); // baþlangýç pos-rot a geri dönecek
+                transform.rotation = startRot;
                 platePool.ReturnPlate(this);
             });
     }

@@ -26,7 +26,7 @@ public class SplineManager : MonoBehaviour
     }
 
     [Button]
-    public void SpawnTurret()
+    public void SpawnTurret() // Turret input a baðlanacak -- Üret diyince pooldan çekiyor bug!
     {
         OnTurretSelected(Random.Range(0, turretPrefabs.Length));
     }

@@ -74,7 +74,19 @@ public class Turret : MonoBehaviour
         currentPlate = null;
         // Animasyon ile Despawn
         // Reset turret
-        LeanPool.Despawn(this);
+        //LeanPool.Despawn(this); 
+        Sequence seq = DOTween.Sequence();
+        seq.Append(transform.DOMove(transform.position + new Vector3(0, 0, 2), 0.3f));
+        seq.Join(transform.DORotate(new Vector3(0, 360, 0), 0.3f));
+        seq.Join(transform.DOScale(0, 0.3f).SetEase(Ease.InOutSine));
+        seq.OnComplete(() => Destroy(gameObject));
+
+        Debug.Log("Buradayýz");
+    }
+
+    public void SendToSlot()
+    {
+        TurretSlotManager.Instance.TryPlaceTurret(this);
     }
 
     void Shot()
