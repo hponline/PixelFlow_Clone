@@ -3,11 +3,11 @@ using Dreamteck.Splines;
 using NaughtyAttributes;
 using Lean.Pool;
 
-public class SplineManager : MonoBehaviour
+public class TurretManager : MonoBehaviour
 {
-    public static SplineManager Instance;
+    public static TurretManager Instance;
 
-    public SplineComputer spline;
+    [SerializeField] SplineComputer spline;
 
     [Header("Turret")]
     [SerializeField] float speed = 5f;
@@ -25,8 +25,14 @@ public class SplineManager : MonoBehaviour
         SpawnTurret();
     }
 
+    public Vector3 GetSplinePosition()
+    {
+        Vector3 splineStartPos = (Vector3)spline.GetPoint(0).position;
+        return splineStartPos;
+    }
+
     [Button]
-    public void SpawnTurret() // Turret input a baðlanacak -- Üret diyince pooldan çekiyor bug!
+    public void SpawnTurret()
     {
         OnTurretSelected(Random.Range(0, turretPrefabs.Length));
     }
@@ -45,4 +51,14 @@ public class SplineManager : MonoBehaviour
         plate.Init(spline, speed, turret, platePool);
     }
 
+    public void TurretSendToSpline(Turret turret)
+    {
+        if (!platePool.TryGetPlate(out Plate plate))
+        {
+            Debug.Log("Boþ plate yok");
+            return;
+        }
+        turret.enabled = false;
+        plate.Init(spline, speed, turret, platePool);
+    }
 }

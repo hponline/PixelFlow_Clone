@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class TurretSlot : MonoBehaviour
+public class TurretSlot : MonoBehaviour, IClickable
 {
     public bool isFull = false;
     Turret currentTurret;
@@ -17,6 +17,16 @@ public class TurretSlot : MonoBehaviour
 
     public void Clear()
     {
+        if (currentTurret == null) return;
+        currentTurret = null;
         isFull = false;
+    }
+
+    public void OnClick()
+    {
+        if (!isFull) return;
+        Turret turret = currentTurret;
+        Clear();
+        TurretManager.Instance.TurretSendToSpline(turret);
     }
 }

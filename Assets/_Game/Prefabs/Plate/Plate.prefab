@@ -249,6 +249,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PlateController
   follower: {fileID: 505411280933526146}
   mountPoint: {fileID: 1671495247140950334}
+  visual: {fileID: 6409958221950481697}
 --- !u!1 &8454225829059092611
 GameObject:
   m_ObjectHideFlags: 0

@@ -1,4 +1,3 @@
-using Dreamteck.Splines;
 using Lean.Pool;
 using UnityEngine;
 using DG.Tweening;
@@ -7,20 +6,19 @@ using System;
 
 public class Turret : MonoBehaviour
 {
-    public SplineFollower follower;
+    [Header("References")]
+    public TurretSOData turretSO;
+    public GameObject projectilePrefab;
+    public Transform firePoint;
+
+    [Header("UI")]
+    public TextMeshProUGUI magazineTxt;
 
     Plate currentPlate;
     public void SetPlate(Plate plate) => currentPlate = plate;
 
-    public TurretSOData turretSO;
-
-    public GameObject projectilePrefab;
-    public Transform firePoint;
-
     [SerializeField] int projectileMagazine;
-
-    [Header("UI")]
-    public TextMeshProUGUI magazineTxt;
+    float animDuration = GameTags.Animation.DOTWEEN_ANIM_DURATION;
 
     event Action<int> OnProjectileFired;
 
@@ -72,21 +70,30 @@ public class Turret : MonoBehaviour
     {
         currentPlate?.RecallPlate();
         currentPlate = null;
-        // Animasyon ile Despawn
-        // Reset turret
-        //LeanPool.Despawn(this); 
-        Sequence seq = DOTween.Sequence();
-        seq.Append(transform.DOMove(transform.position + new Vector3(0, 0, 2), 0.3f));
-        seq.Join(transform.DORotate(new Vector3(0, 360, 0), 0.3f));
-        seq.Join(transform.DOScale(0, 0.3f).SetEase(Ease.InOutSine));
-        seq.OnComplete(() => Destroy(gameObject));
 
-        Debug.Log("Buradayýz");
+        Sequence seq = DOTween.Sequence();
+        seq.Append(transform.DOMove(transform.position + new Vector3(0, 0, 2), animDuration));
+        seq.Join(transform.DORotate(new Vector3(0, 360, 0), animDuration));
+        seq.Join(transform.DOScale(0, animDuration).SetEase(Ease.InOutSine));
+        seq.OnComplete(() => Destroy(gameObject));
     }
 
-    public void SendToSlot()
+    public void SendToSlot() // Animasyon yapýlacak
     {
         TurretSlotManager.Instance.TryPlaceTurret(this);
+    }
+
+    public void SendToPlate(Plate plate, Transform mountPoint)
+    {
+        transform.DOMove(TurretManager.Instance.GetSplinePosition(), animDuration).SetEase(Ease.InOutQuad).OnComplete(() =>
+        {
+            SetPlate(plate);
+            
+            transform.SetParent(mountPoint);
+            transform.localPosition = Vector3.zero;
+            transform.localRotation = Quaternion.identity;
+            this.enabled = true;
+        });
     }
 
     void Shot()
@@ -94,10 +101,8 @@ public class Turret : MonoBehaviour
         projectileMagazine--;
         OnProjectileFired?.Invoke(projectileMagazine);
 
-        if (projectileMagazine <= 0)
-        {
+        if (projectileMagazine <= 0)        
             TurretDeSpawn();
-        }
     }
 
     void UpdateMagazineCount(int remaining)

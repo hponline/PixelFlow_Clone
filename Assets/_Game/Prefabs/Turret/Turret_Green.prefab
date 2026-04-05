@@ -213,7 +213,6 @@ GameObject:
   m_Component:
   - component: {fileID: 3450394646212009779}
   - component: {fileID: 2329293766070656251}
-  - component: {fileID: 4183792635146337218}
   m_Layer: 0
   m_Name: Turret_Green
   m_TagString: Untagged
@@ -250,122 +249,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5fa8cde4423a5e6499654976bf578781, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Turret
-  follower: {fileID: 4183792635146337218}
+  follower: {fileID: 0}
   turretSO: {fileID: 11400000, guid: 8d4225d084c41744db3b7b874f7b9ed7, type: 2}
   projectilePrefab: {fileID: 6109556719478336358, guid: 84feab14f9fa751468a4aae71702f26f, type: 3}
   firePoint: {fileID: 8978166095894519949}
-  projectileMagazine: 5
   magazineTxt: {fileID: 5094581320600697096}
---- !u!114 &4183792635146337218
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5670566829864819776}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4ddc1a2536715a24095c464a2c394d5d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Dreamteck.Splines::Dreamteck.Splines.SplineFollower
-  updateMethod: 0
-  _spline: {fileID: 0}
-  _autoUpdate: 1
-  _rotationModifier:
-    blend: 1
-    useClippedPercent: 0
-    keys: []
-  _offsetModifier:
-    blend: 1
-    useClippedPercent: 0
-    keys: []
-  _colorModifier:
-    blend: 1
-    useClippedPercent: 0
-    keys: []
-  _sizeModifier:
-    blend: 1
-    useClippedPercent: 0
-    keys: []
-  _clipFromSample:
-    position: {x: -3.2718222, y: 0.9999996, z: -0.31805053}
-    up: {x: 0, y: 1, z: 0}
-    forward: {x: 0.6965548, y: -0.00000007755888, z: -0.71750367}
-    color: {r: 1, g: 1, b: 1, a: 1}
-    size: 1
-    percent: 0
-  _clipToSample:
-    position: {x: -3.2718222, y: 0.9999996, z: -0.31805053}
-    up: {x: 0, y: 1, z: 0}
-    forward: {x: 0.6965548, y: -0.00000007755888, z: -0.71750367}
-    color: {r: 1, g: 1, b: 1, a: 1}
-    size: 1
-    percent: 1
-  _loopSamples: 0
-  _clipFrom: 0
-  _clipTo: 1
-  animClipFrom: 0
-  animClipTo: 1
-  multithreaded: 0
-  buildOnAwake: 1
-  buildOnEnable: 0
-  applyDirectionRotation: 1
-  useTriggers: 0
-  triggerGroup: 0
-  _direction: 1
-  _dontLerpDirection: 0
-  _physicsMode: 0
-  _motion:
-    _hasOffset: 0
-    _hasRotationOffset: 1
-    _offset: {x: 0, y: 0}
-    _rotationOffset: {x: 0, y: -90, z: 0}
-    _baseScale: {x: 1, y: 1, z: 1}
-    _2dMode: 0
-    velocityHandleMode: 0
-    applyPositionX: 1
-    applyPositionY: 1
-    applyPositionZ: 1
-    applyPosition2D: 1
-    retainLocalPosition: 0
-    direction: 1
-    applyRotationX: 1
-    applyRotationY: 1
-    applyRotationZ: 1
-    applyRotation2D: 1
-    retainLocalRotation: 0
-    applyScaleX: 0
-    applyScaleY: 0
-    applyScaleZ: 0
-    targetUser: {fileID: 0}
-  targetRigidbody: {fileID: 0}
-  targetRigidbody2D: {fileID: 0}
-  targetTransform: {fileID: 3450394646212009779}
-  _result:
-    position: {x: 0, y: 0, z: 0}
-    up: {x: 0, y: 0, z: 0}
-    forward: {x: 0, y: 0, z: 0}
-    color: {r: 0, g: 0, b: 0, a: 0}
-    size: 0
-    percent: 0
-  wrapMode: 0
-  followMode: 0
-  autoStartPosition: 0
-  _follow: 1
-  _startPosition: 0
-  preserveUniformSpeedWithOffset: 0
-  _followSpeed: 1
-  _followDuration: 1
-  _speedModifier:
-    blend: 1
-    useClippedPercent: 0
-    keys: []
-  _unityOnEndReached:
-    m_PersistentCalls:
-      m_Calls: []
-  _unityOnBeginningReached:
-    m_PersistentCalls:
-      m_Calls: []
+  projectileMagazine: 5
 --- !u!1 &7434315461489343951
 GameObject:
   m_ObjectHideFlags: 0
