@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 8978166095894519949}
   - component: {fileID: 6951374073670293424}
   - component: {fileID: 7172877254144148207}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Muzzle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -102,7 +102,7 @@ GameObject:
   - component: {fileID: 4983548942563440916}
   - component: {fileID: 1485485502463602260}
   - component: {fileID: 2309202442327080622}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Visual
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -199,7 +199,7 @@ BoxCollider:
   m_LayerOverridePriority: 0
   m_IsTrigger: 0
   m_ProvidesContacts: 0
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 3
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
@@ -213,7 +213,8 @@ GameObject:
   m_Component:
   - component: {fileID: 3450394646212009779}
   - component: {fileID: 2329293766070656251}
-  m_Layer: 0
+  - component: {fileID: 2775860461972889151}
+  m_Layer: 6
   m_Name: Turret_Orange
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -249,12 +250,35 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5fa8cde4423a5e6499654976bf578781, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Turret
-  follower: {fileID: 0}
   turretSO: {fileID: 11400000, guid: 6200c74c42a0dd14389b5674777899c9, type: 2}
   projectilePrefab: {fileID: 6109556719478336358, guid: 84feab14f9fa751468a4aae71702f26f, type: 3}
   firePoint: {fileID: 8978166095894519949}
+  canShoot: 1
+  _collider: {fileID: 2775860461972889151}
+  turretManager: {fileID: 0}
   magazineTxt: {fileID: 5094581320600697096}
   projectileMagazine: 5
+--- !u!65 &2775860461972889151
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5670566829864819776}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 1, y: 1, z: 1}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &7434315461489343951
 GameObject:
   m_ObjectHideFlags: 0
@@ -267,7 +291,7 @@ GameObject:
   - component: {fileID: 1711870920140530938}
   - component: {fileID: 5190147065074757784}
   - component: {fileID: 5207619824313673893}
-  m_Layer: 5
+  m_Layer: 6
   m_Name: Canvas
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -367,8 +391,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5804820119449271568}
   - component: {fileID: 5680766357682689450}
-  - component: {fileID: 2840398375770447430}
-  m_Layer: 5
+  m_Layer: 6
   m_Name: MagazineBg
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -403,36 +426,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7589257893474459034}
   m_CullTransparentMesh: 1
---- !u!114 &2840398375770447430
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7589257893474459034}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
-  m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_RaycastTarget: 0
-  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
-  m_Maskable: 1
-  m_OnCullStateChanged:
-    m_PersistentCalls:
-      m_Calls: []
-  m_Sprite: {fileID: 10905, guid: 0000000000000000f000000000000000, type: 0}
-  m_Type: 1
-  m_PreserveAspect: 0
-  m_FillCenter: 1
-  m_FillMethod: 4
-  m_FillAmount: 1
-  m_FillClockwise: 1
-  m_FillOrigin: 0
-  m_UseSpriteMesh: 0
-  m_PixelsPerUnitMultiplier: 1
 --- !u!1 &8023734169656416307
 GameObject:
   m_ObjectHideFlags: 0
@@ -444,7 +437,7 @@ GameObject:
   - component: {fileID: 5000791138056409359}
   - component: {fileID: 5521069542294144927}
   - component: {fileID: 5094581320600697096}
-  m_Layer: 5
+  m_Layer: 6
   m_Name: MagazineTxt
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -492,7 +485,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshProUGUI
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_RaycastTarget: 1
+  m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:

@@ -3,9 +3,10 @@ using UnityEngine;
 [System.Serializable]
 public enum TileType
 {
-    Blue = 0,
-    Orange = 1,
-    Green = 2,
+    None = 0,
+    Blue = 1,
+    Orange = 2,
+    Green = 3,
 }
 
 public class TileDatabase : MonoBehaviour

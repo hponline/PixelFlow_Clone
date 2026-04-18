@@ -12,10 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 119bb645e9932f94ebb8f8b1d8543378, type: 3}
   m_Name: Turret_Orange
   m_EditorClassIdentifier: Assembly-CSharp::TurretSOData
-  TurretColor: 1
+  TurretColor: 2
   blockLayerMask:
     serializedVersion: 2
     m_Bits: 8
   magazine: 10
   projectileSpeed: 0.3
-  raycastRange: 10

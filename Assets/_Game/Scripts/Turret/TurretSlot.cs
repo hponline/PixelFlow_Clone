@@ -1,18 +1,25 @@
+using DG.Tweening;
 using UnityEngine;
 
 public class TurretSlot : MonoBehaviour, IClickable
 {
     public bool isFull = false;
     Turret currentTurret;
+    float animDuration = GameTags.Animation.DOTWEEN_ANIM_DURATION;
 
     public void Place(Turret turret)
     {
         if (isFull) return;
-        currentTurret = turret;
         isFull = true;
         turret.transform.SetParent(transform);
-        turret.transform.localPosition = Vector3.zero;
-        turret.transform.localRotation = Quaternion.identity;
+
+        Sequence seq = DOTween.Sequence();
+        seq.Append(turret.transform.DOLocalMove(Vector3.zero, animDuration));
+        seq.Join(turret.transform.DOLocalRotate(new Vector3(0, 360, 0), animDuration));
+        seq.OnComplete(() =>
+        {
+            currentTurret = turret;
+        });
     }
 
     public void Clear()

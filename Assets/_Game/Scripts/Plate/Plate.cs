@@ -42,7 +42,6 @@ public class Plate : MonoBehaviour
                 turret.SendToPlate(this, mountPoint);
     }
 
-
     private void OnEnd(double percent)
     {
         follower.onEndReached -= OnEnd;

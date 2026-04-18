@@ -1,12 +1,9 @@
-using Lean.Pool;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class PlatePool : MonoBehaviour
 {
-    [SerializeField] private Plate[] platePlace; // platePrefab
-
-    //[SerializeField] private Plate platePrefab; // platePrefab
+    [SerializeField] private Plate[] platePlace;
     [SerializeField] private PlateSlotData slotData;
     [SerializeField] private Transform container;
 
@@ -14,13 +11,9 @@ public class PlatePool : MonoBehaviour
 
     private void Awake()
     {
-        for (int i = 0; i < slotData.maxPlates; i++)
-        {
-            //var plate = LeanPool.Spawn(platePlace[i], container); // platePrefab
-            //availablePlates.Enqueue(plate);
-
+        int count = Mathf.Min(slotData.maxPlates, platePlace.Length);
+        for (int i = 0; i < count; i++)
             availablePlates.Enqueue(platePlace[i]);
-        }
     }
 
     public bool TryGetPlate(out Plate plate)

@@ -1,20 +1,22 @@
+using DG.Tweening;
 using UnityEngine;
 
 public class Block : MonoBehaviour
 {
     public ColorType blockColor;
     public bool isShot = false;
+    public int ring;
 
-    //static readonly ColorType[] values =
-    //(ColorType[])System.Enum.GetValues(typeof(ColorType));
-
-    //void Awake()
-    //{
-    //    blockColor = values[Random.Range(0, values.Length)];
-    //}
+    public int gridX;
+    public int gridZ;
 
     public void DestroyBlock()
     {
-        Destroy(gameObject);
+        transform.DOScale(0, GameTags.Animation.DOTWEEN_ANIM_DURATION).SetEase(Ease.InBack).OnComplete(() =>
+        {
+            //Destroy(gameObject);
+            Lean.Pool.LeanPool.Despawn(gameObject);
+            LevelManager.Instance.grid[gridX, gridZ] = null;
+        });
     }
 }

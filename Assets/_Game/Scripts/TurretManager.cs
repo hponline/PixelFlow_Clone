@@ -1,6 +1,5 @@
 using UnityEngine;
 using Dreamteck.Splines;
-using NaughtyAttributes;
 using Lean.Pool;
 
 public class TurretManager : MonoBehaviour
@@ -15,40 +14,41 @@ public class TurretManager : MonoBehaviour
     [SerializeField] Transform turretContainer;
     [SerializeField] PlatePool platePool;
 
+    GridContext gridContext;
+
     void Awake()
     {
         Instance = this;
     }
 
-    private void Start()
+    public void SpawnTurretWithAmmo(ColorType color, int ammo)
     {
-        SpawnTurret();
+        Turret prefab = GetTurretPrefabByColor(color);
+        Turret turret = LeanPool.Spawn(prefab, turretContainer);
+        turret.Init(gridContext, ammo);
+        turret.enabled = false;
+
+        TurretInventory.Instance.AddTurret(turret.gameObject);
+    }
+
+    Turret GetTurretPrefabByColor(ColorType color)
+    {
+        foreach (var prefab in turretPrefabs)
+            if (prefab.turretSO.TurretColor == color) return prefab;
+
+        Debug.Log($"Prefab bulunamadý: {color}");
+        return turretPrefabs[0];
+    }
+
+    public void SetGridContext(GridContext context)
+    {
+        gridContext = context;
     }
 
     public Vector3 GetSplinePosition()
     {
         Vector3 splineStartPos = (Vector3)spline.GetPoint(0).position;
         return splineStartPos;
-    }
-
-    [Button]
-    public void SpawnTurret()
-    {
-        OnTurretSelected(Random.Range(0, turretPrefabs.Length));
-    }
-
-    public void OnTurretSelected(int index)
-    {
-        if (!platePool.TryGetPlate(out Plate plate))
-        {
-            Debug.Log("Boþ Plate Yok");
-            return;
-        }
-
-        Turret turret = LeanPool.Spawn(turretPrefabs[index], turretContainer);
-        turret.enabled = false;
-
-        plate.Init(spline, speed, turret, platePool);
     }
 
     public void TurretSendToSpline(Turret turret)

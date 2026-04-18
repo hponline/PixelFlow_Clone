@@ -7,5 +7,4 @@ public class TurretSOData : ScriptableObject
     public LayerMask blockLayerMask;
     public int magazine = 20;
     public float projectileSpeed = .3f;
-    public float raycastRange = 10;
 }

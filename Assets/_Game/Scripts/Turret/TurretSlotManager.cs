@@ -5,10 +5,7 @@ public class TurretSlotManager : MonoBehaviour
     public static TurretSlotManager Instance;
     public TurretSlot[] turretSlots;
 
-    private void Awake()
-    {
-        Instance = this;
-    }
+    private void Awake() => Instance = this;
 
     public bool TryPlaceTurret(Turret turret)
     {
