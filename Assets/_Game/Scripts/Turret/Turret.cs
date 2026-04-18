@@ -31,7 +31,6 @@ public class Turret : MonoBehaviour, IClickable
     {
         _collider = GetComponent<Collider>();
 
-        projectileMagazine = turretSO.magazine;
         UpdateMagazineUI();
     }
 
@@ -56,6 +55,27 @@ public class Turret : MonoBehaviour, IClickable
         if (target.isShot) return;
 
         SpawnProjectile(target.transform.position, target);
+    }
+    void SpawnProjectile(Vector3 targetPos, Block block)
+    {
+        Shot();
+        block.isShot = true;
+
+        var obj = LeanPool.Spawn(projectilePrefab, firePoint.position, Quaternion.identity);
+        obj.transform.DOMove(targetPos, turretSO.projectileSpeed)
+            .OnComplete(() =>
+            {
+                LeanPool.Despawn(obj);
+                block.DestroyBlock();
+            });
+    }
+    void Shot()
+    {
+        projectileMagazine--;
+        OnProjectileFired?.Invoke(projectileMagazine);
+
+        if (projectileMagazine <= 0)
+            TurretDeSpawn();
     }
 
     GridSide GetGridSide(Vector2Int gridPos)
@@ -120,27 +140,6 @@ public class Turret : MonoBehaviour, IClickable
         UpdateMagazineUI();
     }
 
-    void SpawnProjectile(Vector3 targetPos, Block block) // Prefab yerine trail renderer olabilir
-    {
-        Shot();
-        block.isShot = true;
-
-        var obj = LeanPool.Spawn(projectilePrefab, firePoint.position, Quaternion.identity);
-        obj.transform.DOMove(targetPos, turretSO.projectileSpeed)
-            .OnComplete(() =>
-            {
-                LeanPool.Despawn(obj);
-                block.DestroyBlock();
-            });
-    }
-    void Shot()
-    {
-        projectileMagazine--;
-        OnProjectileFired?.Invoke(projectileMagazine);
-
-        if (projectileMagazine <= 0)
-            TurretDeSpawn();
-    }
 
     void TurretDeSpawn()
     {
@@ -148,12 +147,12 @@ public class Turret : MonoBehaviour, IClickable
         currentPlate = null;
 
         Sequence seq = DOTween.Sequence();
-        seq.Append(transform.DOMove(transform.position + new Vector3(0, 0, 2), animDuration));
-        seq.Join(transform.DORotate(new Vector3(0, 360, 0), animDuration));
+        seq.Append(transform.DOMove(transform.position, animDuration));
+        seq.Join(transform.DORotate(new Vector3(0, 180, 0), animDuration));
         seq.Join(transform.DOScale(0, animDuration).SetEase(Ease.InOutSine));
-        seq.OnComplete(() => Destroy(gameObject));
+        seq.OnComplete(() => LeanPool.Despawn(this));
     }
-    public void SendToSlot() // Animasyon yapýlacak
+    public void SendToSlot()
     {
         TurretSlotManager.Instance.TryPlaceTurret(this);
         this.enabled = false;
@@ -200,6 +199,11 @@ public class Turret : MonoBehaviour, IClickable
 
     void RemoveFirstTurret()
     {
+        if (!TurretManager.Instance.HasFreePlate())
+        {
+            Debug.Log("Boþ plate yok, kuyruk deðiþmedi");
+            return;
+        }
         TurretInventory.Instance.RemoveTurret(gameObject);
         TurretManager.Instance.TurretSendToSpline(this);
     }
@@ -207,6 +211,5 @@ public class Turret : MonoBehaviour, IClickable
     public void OnClick()
     {
         RemoveFirstTurret();
-        Debug.Log("Burada plate yokken bile Queue dan atýyor. BUG!");
     }
 }

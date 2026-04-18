@@ -34,7 +34,10 @@ public class TurretManager : MonoBehaviour
     Turret GetTurretPrefabByColor(ColorType color)
     {
         foreach (var prefab in turretPrefabs)
-            if (prefab.turretSO.TurretColor == color) return prefab;
+        {
+            if (prefab.turretSO.TurretColor == color)            
+                return prefab;
+        }
 
         Debug.Log($"Prefab bulunamadý: {color}");
         return turretPrefabs[0];
@@ -60,5 +63,10 @@ public class TurretManager : MonoBehaviour
         }
         turret.enabled = false;
         plate.Init(spline, speed, turret, platePool);
+    }
+
+    public bool HasFreePlate()
+    {
+        return platePool.HasAvailablePlate();
     }
 }

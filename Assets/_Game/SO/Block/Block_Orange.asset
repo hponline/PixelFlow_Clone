@@ -12,5 +12,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c629e81094925be43b1aeb8823a8db29, type: 3}
   m_Name: Block_Orange
   m_EditorClassIdentifier: Assembly-CSharp::TilePrefab
-  type: 1
+  type: 2
   prefab: {fileID: 6262631651529982956, guid: ae08ed5b1aec74448b36ed6232c2d063, type: 3}

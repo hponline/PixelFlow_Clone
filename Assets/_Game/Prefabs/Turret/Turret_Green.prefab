@@ -251,13 +251,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Turret
   turretSO: {fileID: 11400000, guid: 8d4225d084c41744db3b7b874f7b9ed7, type: 2}
-  projectilePrefab: {fileID: 6109556719478336358, guid: 84feab14f9fa751468a4aae71702f26f, type: 3}
+  projectilePrefab: {fileID: 633285130601763063, guid: 747e9320b429ac242aa86c55aea5f554, type: 3}
   firePoint: {fileID: 8978166095894519949}
   canShoot: 1
-  _collider: {fileID: -2757319343618917048}
-  turretManager: {fileID: 0}
-  magazineTxt: {fileID: 5094581320600697096}
   projectileMagazine: 5
+  magazineTxt: {fileID: 5094581320600697096}
 --- !u!65 &-2757319343618917048
 BoxCollider:
   m_ObjectHideFlags: 0

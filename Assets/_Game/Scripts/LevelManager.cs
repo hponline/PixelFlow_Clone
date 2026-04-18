@@ -101,7 +101,6 @@ public class LevelManager : MonoBehaviour
 
             ColorType color = (ColorType)entry.Key;
             int remaining = entry.Value;
-
             while (remaining > 0)
             {
                 int ammo = UnityEngine.Random.Range(1, Mathf.Min(40, remaining) + 1);

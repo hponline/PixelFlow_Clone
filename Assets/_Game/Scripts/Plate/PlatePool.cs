@@ -16,6 +16,11 @@ public class PlatePool : MonoBehaviour
             availablePlates.Enqueue(platePlace[i]);
     }
 
+    public bool HasAvailablePlate()
+    {
+        return availablePlates.Count > 0;
+    }
+
     public bool TryGetPlate(out Plate plate)
     {
         if (availablePlates.Count > 0)

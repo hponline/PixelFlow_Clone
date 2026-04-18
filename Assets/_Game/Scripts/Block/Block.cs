@@ -14,7 +14,6 @@ public class Block : MonoBehaviour
     {
         transform.DOScale(0, GameTags.Animation.DOTWEEN_ANIM_DURATION).SetEase(Ease.InBack).OnComplete(() =>
         {
-            //Destroy(gameObject);
             Lean.Pool.LeanPool.Despawn(gameObject);
             LevelManager.Instance.grid[gridX, gridZ] = null;
         });

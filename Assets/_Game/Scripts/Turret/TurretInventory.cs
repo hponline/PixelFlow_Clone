@@ -12,6 +12,7 @@ public class TurretInventory : MonoBehaviour
     [SerializeField] private Transform[] rayStartPoints;
 
     private List<List<GameObject>> rays = new();
+    private int currentRayIndex = 0;
 
     private void Awake()
     {
@@ -23,9 +24,9 @@ public class TurretInventory : MonoBehaviour
 
     public void AddTurret(GameObject turretObj)
     {
-        int randomRay = Random.Range(0, rays.Count); // Raylara rastgele deðil sýra ile ekle
-        rays[randomRay].Add(turretObj);
-        RefreshRay(randomRay);
+        rays[currentRayIndex].Add(turretObj);
+        RefreshRay(currentRayIndex);
+        currentRayIndex = (currentRayIndex + 1) % rays.Count;
     }
 
     public void RemoveTurret(GameObject turretObj)
