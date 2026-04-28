@@ -3,15 +3,15 @@ using UnityEngine;
 
 public class PlatePool : MonoBehaviour
 {
-    [SerializeField] private Plate[] platePlace;
-    [SerializeField] private PlateSlotData slotData;
-    [SerializeField] private Transform container;
+    [SerializeField] Plate[] platePlace;
+    [SerializeField] int maxPlate = 5;
+    [SerializeField] Transform container;
 
-    private Queue<Plate> availablePlates = new();
+    Queue<Plate> availablePlates = new();
 
     private void Awake()
     {
-        int count = Mathf.Min(slotData.maxPlates, platePlace.Length);
+        int count = Mathf.Min(maxPlate, platePlace.Length);
         for (int i = 0; i < count; i++)
             availablePlates.Enqueue(platePlace[i]);
     }

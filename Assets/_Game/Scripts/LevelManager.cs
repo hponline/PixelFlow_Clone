@@ -70,7 +70,7 @@ public class LevelManager : MonoBehaviour
                     continue;
                 }
 
-                Vector3 pos = gridComponent.GetCellCenterWorld(new Vector3Int(x, 0, y)); // buradayýz
+                Vector3 pos = gridComponent.GetCellCenterWorld(new Vector3Int(x, 0, y));
                 GameObject prefab = database.GetPrefab(type);
                 GameObject spawned = LeanPool.Spawn(prefab, pos, Quaternion.identity, blockContainer);
 
@@ -93,7 +93,7 @@ public class LevelManager : MonoBehaviour
         DistributeTurrets();
     }
 
-    void DistributeTurrets()
+    void DistributeTurrets() // Mermi daðýtým
     {
         foreach (var entry in tileCounts)
         {

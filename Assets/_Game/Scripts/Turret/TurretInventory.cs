@@ -66,7 +66,9 @@ public class TurretInventory : MonoBehaviour
         for (int i = 0; i < ray.Count; i++)
         {
             if (ray[i].TryGetComponent<Turret>(out var t))
+            {
                 t.SetClickable(i == 0);
+            }
         }
     }
 }

@@ -4,49 +4,84 @@ using DG.Tweening;
 using TMPro;
 using System;
 
+public enum TurretState { InInventory, InSlot, OnPlate, Despawning }
 public enum GridSide { None, Bottom, Top, Left, Right }
 [RequireComponent(typeof(Collider))]
 public class Turret : MonoBehaviour, IClickable
 {
+    public event Action<TurretState, TurretState> OnStateChanged;
     event Action<int> OnProjectileFired;
 
     [Header("References")]
     public TurretSOData turretSO;
     public GameObject projectilePrefab;
     public Transform firePoint;
-    public bool canShoot;
-    [SerializeField] int projectileMagazine;
+    //public bool canShoot;
 
     [Header("UI")]
+    [SerializeField] int projectileMagazine;
     public TextMeshProUGUI magazineTxt;
+    Collider _collider;
 
-    public void SetPlate(Plate plate) => currentPlate = plate;
+    //public void SetPlate(Plate plate) => currentPlate = plate;
 
     float animDuration = GameTags.Animation.DOTWEEN_ANIM_DURATION;
     Plate currentPlate;
-    Collider _collider;
     GridContext gridContext;
+    [SerializeField] TurretState currentState;
 
     private void Awake()
     {
         _collider = GetComponent<Collider>();
-
         UpdateMagazineUI();
     }
 
     private void Update()
     {
-        TryShoot();
+        if (currentState == TurretState.OnPlate)
+            TryShoot();
     }
+    public void Init(GridContext context, int ammo)
+    {
+        gridContext = context;
+        projectileMagazine = ammo;
+        UpdateMagazineUI();
+        SetState(TurretState.InInventory);
+    }
+
+    public void SetState(TurretState next)
+    {
+        TurretState prev = currentState;
+        currentState = next;
+
+        switch (next)
+        {
+            case TurretState.InInventory:
+                SetClickable(false);
+                break;
+            case TurretState.InSlot:
+                SetClickable(false);
+                break;
+            case TurretState.OnPlate:
+                SetClickable(false);
+                break;
+            case TurretState.Despawning:
+                SetClickable(false);
+                TurretDeSpawn();
+                break;
+        }
+
+        OnStateChanged?.Invoke(prev, next);
+    }
+
 
     void TryShoot()
     {
         if (projectileMagazine <= 0) return;
-        if (!canShoot) return;
+        //if (!canShoot) return;
 
         Vector2Int gridPos = WorldToGrid(transform.position);
         GridSide side = GetGridSide(gridPos);
-
         if (side == GridSide.None) return; // Köþede veya grid içinde, ateþ etme
 
         Block target = FindTargetBlock(gridPos, side);
@@ -60,7 +95,6 @@ public class Turret : MonoBehaviour, IClickable
     {
         Shot();
         block.isShot = true;
-
         var obj = LeanPool.Spawn(projectilePrefab, firePoint.position, Quaternion.identity);
         obj.transform.DOMove(targetPos, turretSO.projectileSpeed)
             .OnComplete(() =>
@@ -74,10 +108,14 @@ public class Turret : MonoBehaviour, IClickable
         projectileMagazine--;
         OnProjectileFired?.Invoke(projectileMagazine);
 
+        transform.DOKill(true);
+        transform.DOPunchScale(Vector3.one * 0.4f, 0.2f, vibrato: 1, elasticity: 0.1f);
+
         if (projectileMagazine <= 0)
-            TurretDeSpawn();
+            SetState(TurretState.Despawning);
     }
 
+    #region Grid iþlemleri
     GridSide GetGridSide(Vector2Int gridPos)
     {
         bool onBottom = gridPos.y < 0;
@@ -132,39 +170,39 @@ public class Turret : MonoBehaviour, IClickable
         Vector3Int cell = LevelManager.Instance.gridComponent.WorldToCell(worldPos);
         return new Vector2Int(cell.x, cell.z);
     }
-
-    public void Init(GridContext context, int ammo)
-    {
-        gridContext = context;
-        projectileMagazine = ammo;
-        UpdateMagazineUI();
-    }
+    #endregion
 
 
     void TurretDeSpawn()
     {
-        currentPlate?.RecallPlate();
+        currentPlate.RecallPlate();
         currentPlate = null;
 
         Sequence seq = DOTween.Sequence();
-        seq.Append(transform.DOMove(transform.position, animDuration));
+        seq.Append(transform.DOMove(transform.position + Vector3.forward, animDuration));
         seq.Join(transform.DORotate(new Vector3(0, 180, 0), animDuration));
         seq.Join(transform.DOScale(0, animDuration).SetEase(Ease.InOutSine));
         seq.OnComplete(() => LeanPool.Despawn(this));
     }
+
+    public void SetPlate(Plate plate) => currentPlate = plate;
+    public Plate GetPlate() => currentPlate;
+    public void SetClickable(bool state) => _collider.enabled = state;
+
     public void SendToSlot()
     {
-        TurretSlotManager.Instance.TryPlaceTurret(this);
+        if (!TurretSlotManager.Instance.TryPlaceTurret(this)) return;
+        SetState(TurretState.InSlot);
         this.enabled = false;
-        SetClickable(true);
+        //SetClickable(true);
     }
 
     public void SendToPlate(Plate plate, Transform mountPoint)
     {
         transform.DOMove(TurretManager.Instance.GetSplinePosition(), animDuration).SetEase(Ease.InOutQuad).OnComplete(() =>
         {
+            SetState(TurretState.OnPlate);
             SetPlate(plate);
-
             transform.SetParent(mountPoint);
             transform.localPosition = Vector3.zero;
             transform.localRotation = Quaternion.identity;
@@ -183,6 +221,15 @@ public class Turret : MonoBehaviour, IClickable
         magazineTxt.SetText(projectileMagazine.ToString());
     }
 
+
+    public void OnClick()
+    {
+        if (currentState != TurretState.InInventory) return;
+        if (!TurretManager.Instance.HasFreePlate()) return;
+
+        TurretInventory.Instance.RemoveTurret(gameObject);
+        TurretManager.Instance.TurretSendToSpline(this);
+    }
     private void OnEnable()
     {
         OnProjectileFired += UpdateMagazineCount;
@@ -190,26 +237,5 @@ public class Turret : MonoBehaviour, IClickable
     private void OnDisable()
     {
         OnProjectileFired -= UpdateMagazineCount;
-    }
-
-    public void SetClickable(bool state)
-    {
-        _collider.enabled = state;
-    }
-
-    void RemoveFirstTurret()
-    {
-        if (!TurretManager.Instance.HasFreePlate())
-        {
-            Debug.Log("Boþ plate yok, kuyruk deðiþmedi");
-            return;
-        }
-        TurretInventory.Instance.RemoveTurret(gameObject);
-        TurretManager.Instance.TurretSendToSpline(this);
-    }
-
-    public void OnClick()
-    {
-        RemoveFirstTurret();
     }
 }

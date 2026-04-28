@@ -39,7 +39,7 @@ public class Plate : MonoBehaviour
                 follower.followSpeed = speed;
                 follower.enabled = true;
             });
-                turret.SendToPlate(this, mountPoint);
+        turret.SendToPlate(this, mountPoint);
     }
 
     private void OnEnd(double percent)
@@ -48,7 +48,11 @@ public class Plate : MonoBehaviour
 
         if (currentTurret != null)
         {
+            //
+            currentTurret.OnStateChanged -= OnTurretStateChanged;
+            
             currentTurret.transform.SetParent(null);
+
             currentTurret.SendToSlot();
             currentTurret = null;
         }
@@ -77,5 +81,15 @@ public class Plate : MonoBehaviour
                 visual.transform.rotation = startRot;
                 platePool.ReturnPlate(this);
             });
+    }
+
+    void OnTurretStateChanged(TurretState prev, TurretState next)
+    {
+        if (next == TurretState.Despawning)
+        {
+            currentTurret.OnStateChanged -= OnTurretStateChanged;
+            currentTurret = null;
+            ReturnToStart();
+        }
     }
 }

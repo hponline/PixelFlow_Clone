@@ -12,7 +12,7 @@ public class Block : MonoBehaviour
 
     public void DestroyBlock()
     {
-        transform.DOScale(0, GameTags.Animation.DOTWEEN_ANIM_DURATION).SetEase(Ease.InBack).OnComplete(() =>
+        transform.DOScale(0, GameTags.Animation.DOTWEEN_BLOCK_DEAD_DURATION).SetEase(Ease.InBack).OnComplete(() =>
         {
             Lean.Pool.LeanPool.Despawn(gameObject);
             LevelManager.Instance.grid[gridX, gridZ] = null;
