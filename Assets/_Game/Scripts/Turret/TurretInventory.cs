@@ -65,10 +65,35 @@ public class TurretInventory : MonoBehaviour
         var ray = rays[rayIndex];
         for (int i = 0; i < ray.Count; i++)
         {
-            if (ray[i].TryGetComponent<Turret>(out var t))
+            if (!ray[i].TryGetComponent<Turret>(out var turret)) continue;
+
+            // Linked yoksa normal kural: sadece index 0 týklanabilir
+            var link = ray[i].GetComponent<TurretLink>();
+            if (link == null || !link.HasLink)
             {
-                t.SetClickable(i == 0);
+                turret.SetClickable(i == 0);
+                continue;
             }
+            // Linked varsa: hem index 0 olmalý hem bað geçerli olmalý
+            bool isFirst = i == 0;
+            bool linkValid = LinkValidator.IsLinkValid(
+                ray[i],
+                link.linkedTurret.gameObject,
+                rays);
+
+            turret.SetClickable(isFirst && linkValid);
         }
     }
+
+    //void UpdateClickable(int rayIndex)
+    //{
+    //    var ray = rays[rayIndex];
+    //    for (int i = 0; i < ray.Count; i++)
+    //    {
+    //        if (ray[i].TryGetComponent<Turret>(out var t))
+    //        {
+    //            t.SetClickable(i == 0);
+    //        }
+    //    }
+    //}
 }

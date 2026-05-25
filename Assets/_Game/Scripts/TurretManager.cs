@@ -21,14 +21,15 @@ public class TurretManager : MonoBehaviour
         Instance = this;
     }
 
-    public void SpawnTurretWithAmmo(ColorType color, int ammo)
+    public Turret SpawnTurretWithAmmo(ColorType color, int ammo)
     {
         Turret prefab = GetTurretPrefabByColor(color);
         Turret turret = LeanPool.Spawn(prefab, turretContainer);
         turret.Init(gridContext, ammo);
         turret.enabled = false;
-
         TurretInventory.Instance.AddTurret(turret.gameObject);
+
+        return turret;
     }
 
     Turret GetTurretPrefabByColor(ColorType color)
@@ -65,8 +66,13 @@ public class TurretManager : MonoBehaviour
         plate.Init(spline, speed, turret, platePool);
     }
 
-    public bool HasFreePlate()
+    public bool HasFreePlates(int count)
     {
-        return platePool.HasAvailablePlate();
+        return platePool.AvailableCount >= count;
     }
+
+    //public bool HasFreePlate()
+    //{
+    //    return platePool.HasAvailablePlate();
+    //}
 }

@@ -54,7 +54,8 @@ public class TurretSlot : MonoBehaviour, IClickable
     public void OnClick()
     {
         if (!isFull) return;
-        if (!TurretManager.Instance.HasFreePlate()) return;
+        //if (!TurretManager.Instance.HasFreePlate()) return;
+        //if (!TurretManager.Instance.HasFreePlates()) return;
 
         Turret turret = currentTurret;
 

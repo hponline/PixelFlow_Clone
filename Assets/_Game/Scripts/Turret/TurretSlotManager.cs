@@ -24,14 +24,6 @@ public class TurretSlotManager : MonoBehaviour
         return false;
     }
 
-    //public void RemoveTurret(int slotIndex)
-    //{
-    //    if (!turretSlots[slotIndex].isFull) return;
-
-    //    turretSlots[slotIndex].ClearState();
-    //    CompactSlots(slotIndex);
-    //}
-
     public void CompactSlots(int fromIndex)
     {
         isCompacting = true;

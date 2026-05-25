@@ -19,6 +19,10 @@ public class LevelManager : MonoBehaviour
     public Grid gridComponent;
     public int turretMaxAmmo;
 
+    [Header("Turret Links")]
+    [Range(0f, 1f)]
+    [SerializeField] float linkChance = 0.5f;
+
     GridContext gridContext;
     Dictionary<int, int> tileCounts;
 
@@ -95,6 +99,8 @@ public class LevelManager : MonoBehaviour
 
     void DistributeTurrets() // Mermi daðýtým
     {
+        List<Turret> spawnedTurrets = new List<Turret>();
+
         foreach (var entry in tileCounts)
         {
             if (entry.Key == (int)ColorType.None) continue;
@@ -105,8 +111,32 @@ public class LevelManager : MonoBehaviour
             {
                 int ammo = UnityEngine.Random.Range(1, Mathf.Min(40, remaining) + 1);
                 remaining -= ammo;
-                TurretManager.Instance.SpawnTurretWithAmmo(color, ammo);
+
+                Turret turret = TurretManager.Instance.SpawnTurretWithAmmo(color, ammo);
+                spawnedTurrets.Add(turret);
             }
+        }
+
+        LinkTurrets(spawnedTurrets);
+    }
+
+    void LinkTurrets(List<Turret> turrets)
+    {
+        ShuffleTurrets(turrets);
+
+        for (int i = 0; i + 1 < turrets.Count; i += 2)
+        {
+            if (UnityEngine.Random.value <= linkChance)
+                turrets[i].GetComponent<TurretLink>().Link(turrets[i + 1]);
+        }
+    }
+
+    void ShuffleTurrets(List<Turret> list)
+    {
+        for (int i = list.Count - 1; i > 0; i--)
+        {
+            int j = UnityEngine.Random.Range(0, i + 1);
+            (list[i], list[j]) = (list[j], list[i]);
         }
     }
 

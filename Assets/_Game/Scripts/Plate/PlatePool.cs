@@ -7,6 +7,8 @@ public class PlatePool : MonoBehaviour
     [SerializeField] int maxPlate = 5;
     [SerializeField] Transform container;
 
+    public int AvailableCount => availablePlates.Count;
+
     Queue<Plate> availablePlates = new();
 
     private void Awake()
@@ -16,10 +18,10 @@ public class PlatePool : MonoBehaviour
             availablePlates.Enqueue(platePlace[i]);
     }
 
-    public bool HasAvailablePlate()
-    {
-        return availablePlates.Count > 0;
-    }
+    //public bool HasAvailablePlate()
+    //{
+    //    return availablePlates.Count > 0;
+    //}
 
     public bool TryGetPlate(out Plate plate)
     {
