@@ -48,7 +48,7 @@ public class Turret : MonoBehaviour, IClickable
         UpdateMagazineUI();
 
         var link = GetComponent<TurretLink>();
-        if (link != null) link.Reset();
+        if (link != null) link.Clear();
 
         SetState(TurretState.InInventory);
     }
@@ -83,7 +83,6 @@ public class Turret : MonoBehaviour, IClickable
     void TryShoot()
     {
         if (projectileMagazine <= 0) return;
-        //if (!canShoot) return;
 
         Vector2Int gridPos = WorldToGrid(transform.position);
         GridSide side = GetGridSide(gridPos);
@@ -132,15 +131,14 @@ public class Turret : MonoBehaviour, IClickable
             return;
         }
 
-        // Ýkisi de bittiyse ikisi birden ölür
-        if (link.linkedTurret.projectileMagazine <= 0 || link.waitingForDespawn)
+        if (link.LinkedTurret.projectileMagazine <= 0 || link.WaitingForDespawn)
         {
 
-            link.linkedTurret.SetState(TurretState.Despawning);
+            link.LinkedTurret.SetState(TurretState.Despawning);
             SetState(TurretState.Despawning);
             return;
         }
-        link.waitingForDespawn = true;
+        link.SetWaitingForDespawn(true);
     }
 
     void TurretDeSpawn()
@@ -210,8 +208,8 @@ public class Turret : MonoBehaviour, IClickable
         Vector3Int cell = LevelManager.Instance.gridComponent.WorldToCell(worldPos);
         return new Vector2Int(cell.x, cell.z);
     }
-    #endregion
 
+    #endregion
 
 
     public void SendToSlot()
@@ -221,7 +219,7 @@ public class Turret : MonoBehaviour, IClickable
         this.enabled = false;
     }
 
-    public void SendToPlate(Plate plate, Transform mountPoint)
+    public void SendToPlate(Plate plate, Transform mountPoint, Action onComplete = null)
     {
         transform.DOMove(TurretManager.Instance.GetSplinePosition(), animDuration).SetEase(Ease.InOutQuad).OnComplete(() =>
         {
@@ -232,6 +230,8 @@ public class Turret : MonoBehaviour, IClickable
             transform.localRotation = Quaternion.identity;
             this.enabled = true;
             SetClickable(false);
+
+            onComplete?.Invoke();
         });
     }
 
@@ -260,26 +260,36 @@ public class Turret : MonoBehaviour, IClickable
         int requiredPlates = hasLink ? 2 : 1;
         if (!TurretManager.Instance.HasFreePlates(requiredPlates)) return;
 
-        TurretInventory.Instance.RemoveTurret(gameObject);
-        TurretManager.Instance.TurretSendToSpline(this);
+        Turret linked = hasLink ? link.LinkedTurret : null;
 
-        // Linked'i gönder
-        if (hasLink)
+        TurretInventory.Instance.RemoveTurret(gameObject);
+
+        // Ýlk turret mount'a oturanca linked gönderilir
+        TurretManager.Instance.TurretSendToSpline(this, onComplete: () =>
         {
-            Turret linked = link.linkedTurret;
-            TurretInventory.Instance.RemoveTurret(linked.gameObject); // dotwen ile sýrayla gönder
+            if (linked == null) return;
+            TurretInventory.Instance.RemoveTurret(linked.gameObject);
             TurretManager.Instance.TurretSendToSpline(linked);
-        }
+        });
     }
 
-    //public void OnClick()
-    //{
-    //    if (currentState != TurretState.InInventory) return;
-    //    if (!TurretManager.Instance.HasFreePlate()) return;
+    public void SendToSplineWithLink()
+    {
+        var link = GetComponent<TurretLink>();
+        bool hasLink = link != null && link.HasLink;
 
-    //    TurretInventory.Instance.RemoveTurret(gameObject);
-    //    TurretManager.Instance.TurretSendToSpline(this);
-    //}
+        int requiredPlates = hasLink ? 2 : 1;
+        if (!TurretManager.Instance.HasFreePlates(requiredPlates)) return;
+
+        Turret linked = hasLink ? link.LinkedTurret : null;
+
+        TurretManager.Instance.TurretSendToSpline(this, onComplete: () =>
+        {
+            if (linked == null) return;
+            TurretManager.Instance.TurretSendToSpline(linked);
+        });
+    }
+
     private void OnEnable()
     {
         OnProjectileFired += UpdateMagazineCount;

@@ -1,5 +1,6 @@
 using DG.Tweening;
 using Dreamteck.Splines;
+using System;
 using UnityEngine;
 
 public class Plate : MonoBehaviour
@@ -10,7 +11,9 @@ public class Plate : MonoBehaviour
 
     PlatePool platePool;
     Turret currentTurret;
-    float animDuration = GameTags.Animation.DOTWEEN_ANIM_DURATION;
+    Action onMountComplete;
+
+    readonly float animDuration = GameTags.Animation.DOTWEEN_ANIM_DURATION;
     Vector3 startPos = Vector3.zero;
     Quaternion startRot = Quaternion.identity;
 
@@ -20,26 +23,36 @@ public class Plate : MonoBehaviour
         startRot = transform.rotation;
     }
 
-    public void Init(SplineComputer spline, float speed, Turret turret, PlatePool pool)
+    public void Init(SplineComputer spline, float speed, Turret turret, PlatePool pool, Action onComplete = null)
     {
         platePool = pool;
+        onMountComplete = onComplete;
         gameObject.SetActive(true);
         DOTween.Kill(transform);
 
         transform.DOMove(TurretManager.Instance.GetSplinePosition(), animDuration)
             .SetEase(Ease.InOutQuad)
-            .OnComplete(() =>
-            {
-                visual.transform.localRotation = Quaternion.Euler(0, 90, 90);
-                currentTurret = turret;
+            .OnComplete(() => StartFollowing(spline, speed));
 
-                follower.spline = spline;
-                follower.SetPercent(0);
-                follower.onEndReached += OnEnd;
-                follower.followSpeed = speed;
-                follower.enabled = true;
-            });
-        turret.SendToPlate(this, mountPoint);
+        turret.SendToPlate(this, mountPoint, () => MountTurret(turret));
+    }
+
+    private void MountTurret(Turret turret)
+    {
+        currentTurret = turret;
+        currentTurret.OnStateChanged += OnTurretStateChanged;
+        onMountComplete?.Invoke();
+        onMountComplete = null;
+    }
+
+    private void StartFollowing(SplineComputer spline, float speed)
+    {
+        visual.localRotation = Quaternion.Euler(0, 90, 90);
+        follower.spline = spline;
+        follower.SetPercent(0);
+        follower.followSpeed = speed;
+        follower.onEndReached += OnEnd;
+        follower.enabled = true;
     }
 
     private void OnEnd(double percent)
@@ -48,13 +61,10 @@ public class Plate : MonoBehaviour
 
         if (currentTurret != null)
         {
-            //
             currentTurret.OnStateChanged -= OnTurretStateChanged;
-            
             currentTurret.transform.SetParent(null);
-
             currentTurret.SendToSlot();
-            currentTurret = null;
+            UnsubscribeTurret();
         }
 
         ReturnToStart();
@@ -62,10 +72,14 @@ public class Plate : MonoBehaviour
 
     public void RecallPlate()
     {
-        if (currentTurret != null)
-            currentTurret = null;
-
+        UnsubscribeTurret();
         ReturnToStart();
+    }
+    private void UnsubscribeTurret()
+    {
+        if (currentTurret == null) return;
+        currentTurret.OnStateChanged -= OnTurretStateChanged;
+        currentTurret = null;
     }
 
     void ReturnToStart()
@@ -78,18 +92,17 @@ public class Plate : MonoBehaviour
             .SetEase(Ease.InOutQuad)
             .OnComplete(() =>
             {
-                visual.transform.rotation = startRot;
+                visual.rotation = startRot;
                 platePool.ReturnPlate(this);
             });
     }
 
     void OnTurretStateChanged(TurretState prev, TurretState next)
     {
-        if (next == TurretState.Despawning)
-        {
-            currentTurret.OnStateChanged -= OnTurretStateChanged;
-            currentTurret = null;
-            ReturnToStart();
-        }
+        if (next == TurretState.Despawning) return;
+        if (currentTurret == null) return;
+
+        UnsubscribeTurret();
+        ReturnToStart();
     }
 }

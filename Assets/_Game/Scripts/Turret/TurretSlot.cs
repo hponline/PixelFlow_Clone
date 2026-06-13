@@ -4,12 +4,14 @@ using UnityEngine;
 public class TurretSlot : MonoBehaviour, IClickable
 {
     [SerializeField] int slotIndex;
+    [SerializeField] Collider _collider;
     public bool isFull = false;
 
     float animDuration = GameTags.Animation.DOTWEEN_ANIM_DURATION;
     Turret currentTurret;
+
     public Turret CurrentTurret => currentTurret;
-    [SerializeField] Collider _collider;
+    public int SlotIndex => slotIndex;
 
     public void Place(Turret turret, bool isCompacting = false)
     {
@@ -54,13 +56,23 @@ public class TurretSlot : MonoBehaviour, IClickable
     public void OnClick()
     {
         if (!isFull) return;
-        //if (!TurretManager.Instance.HasFreePlate()) return;
-        //if (!TurretManager.Instance.HasFreePlates()) return;
 
         Turret turret = currentTurret;
+        var link = turret.GetComponent<TurretLink>();
+        bool hasLink = link != null && link.HasLink;
+
+        int requiredPlates = hasLink ? 2 : 1;
+        if (!TurretManager.Instance.HasFreePlates(requiredPlates)) return;
+
+        // Linked turret'i slottan çýkar
+        if (hasLink)
+        {
+            TurretSlot linkedSlot = TurretSlotManager.Instance.GetSlotOf(link.LinkedTurret);
+            linkedSlot?.ClearState();
+        }
 
         ClearState();
-        TurretManager.Instance.TurretSendToSpline(turret);
         TurretSlotManager.Instance.CompactSlots(slotIndex);
+        turret.SendToSplineWithLink();
     }
 }

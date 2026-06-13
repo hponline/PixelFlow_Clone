@@ -7,5 +7,12 @@
      0, 2, 0, 1, 0 ,
      0, 0, 1, 0, 2 ,
      2, 0, 0, 1, 1 
+  ],
+  "turrets": [
+    { "id": 0, "color": 1, "ammo": 20, "linkedTo": 1 },
+    { "id": 1, "color": 1, "ammo": 15, "linkedTo": 0 },
+    { "id": 2, "color": 2, "ammo": 10, "linkedTo": 3 },
+    { "id": 3, "color": 2, "ammo": 12, "linkedTo": 2 },
+    { "id": 4, "color": 1, "ammo": 8,  "linkedTo": -1 }
   ]
 }

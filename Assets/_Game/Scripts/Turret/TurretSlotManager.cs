@@ -24,20 +24,37 @@ public class TurretSlotManager : MonoBehaviour
         return false;
     }
 
-    public void CompactSlots(int fromIndex)
+    public void CompactSlots(int fromIndex, int secondIndex = -1)
     {
         isCompacting = true;
 
-        for (int i = fromIndex; i < turretSlots.Length - 1; i++)
-        {
-            // Bir sonraki slot boþsa kaydýracak bir þey yok
-            if (!turretSlots[i + 1].isFull) break;
+        // Ýki boþluk varsa küçük index'ten büyüðe sýrala
+        List<int> emptyIndices = new List<int> { fromIndex };
+        if (secondIndex >= 0) emptyIndices.Add(secondIndex);
+        emptyIndices.Sort();
 
-            Turret turret = turretSlots[i + 1].CurrentTurret;
-            turretSlots[i + 1].ClearState();
-            turretSlots[i].Place(turret, isCompacting: true);
+        // Her boþluk için sola kaydýr
+        foreach (int emptyIndex in emptyIndices)
+        {
+            for (int i = emptyIndex; i < turretSlots.Length - 1; i++)
+            {
+                if (!turretSlots[i + 1].isFull) break;
+
+                Turret t = turretSlots[i + 1].CurrentTurret;
+                turretSlots[i + 1].ClearState();
+                turretSlots[i].Place(t, isCompacting: true);
+            }
         }
 
         isCompacting = false;
-    }    
+    }
+
+    public TurretSlot GetSlotOf(Turret turret)
+    {
+        foreach (var slot in turretSlots)
+        {
+            if (slot.CurrentTurret == turret) return slot;
+        }
+        return null;
+    }
 }

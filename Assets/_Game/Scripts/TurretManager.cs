@@ -1,6 +1,7 @@
 using UnityEngine;
 using Dreamteck.Splines;
 using Lean.Pool;
+using System;
 
 public class TurretManager : MonoBehaviour
 {
@@ -55,7 +56,7 @@ public class TurretManager : MonoBehaviour
         return splineStartPos;
     }
 
-    public void TurretSendToSpline(Turret turret)
+    public void TurretSendToSpline(Turret turret, Action onComplete = null)
     {
         if (!platePool.TryGetPlate(out Plate plate))
         {
@@ -63,7 +64,7 @@ public class TurretManager : MonoBehaviour
             return;
         }
         turret.enabled = false;
-        plate.Init(spline, speed, turret, platePool);
+        plate.Init(spline, speed, turret, platePool, onComplete);
     }
 
     public bool HasFreePlates(int count)
@@ -71,8 +72,4 @@ public class TurretManager : MonoBehaviour
         return platePool.AvailableCount >= count;
     }
 
-    //public bool HasFreePlate()
-    //{
-    //    return platePool.HasAvailablePlate();
-    //}
 }

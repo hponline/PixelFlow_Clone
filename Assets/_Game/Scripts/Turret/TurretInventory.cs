@@ -67,33 +67,48 @@ public class TurretInventory : MonoBehaviour
         {
             if (!ray[i].TryGetComponent<Turret>(out var turret)) continue;
 
-            // Linked yoksa normal kural: sadece index 0 týklanabilir
             var link = ray[i].GetComponent<TurretLink>();
             if (link == null || !link.HasLink)
             {
                 turret.SetClickable(i == 0);
                 continue;
             }
-            // Linked varsa: hem index 0 olmalý hem bað geçerli olmalý
+
             bool isFirst = i == 0;
             bool linkValid = LinkValidator.IsLinkValid(
                 ray[i],
-                link.linkedTurret.gameObject,
+                link.LinkedTurret.gameObject,
                 rays);
 
             turret.SetClickable(isFirst && linkValid);
         }
     }
 
-    //void UpdateClickable(int rayIndex)
-    //{
-    //    var ray = rays[rayIndex];
-    //    for (int i = 0; i < ray.Count; i++)
-    //    {
-    //        if (ray[i].TryGetComponent<Turret>(out var t))
-    //        {
-    //            t.SetClickable(i == 0);
-    //        }
-    //    }
-    //}
+
+    public Turret GetNeighbor(GameObject turretObj)
+    {
+        var (rayIndex, index) = GetPosition(turretObj);
+        if (rayIndex == -1) return null;
+
+        // Arkasý — ayný ray, bir sonraki index
+        if (index + 1 < rays[rayIndex].Count)
+            if (rays[rayIndex][index + 1].TryGetComponent<Turret>(out var behind))
+                return behind;
+
+        // Yaný — komþu ray, ayný index
+        int neighborRay = (rayIndex + 1) % rays.Count;
+        if (index < rays[neighborRay].Count)
+            if (rays[neighborRay][index].TryGetComponent<Turret>(out var beside))
+                return beside;
+
+        return null;
+    }
+
+    public (int rayIndex, int index) GetPosition(GameObject turretObj)
+    {
+        for (int r = 0; r < rays.Count; r++)
+            for (int i = 0; i < rays[r].Count; i++)
+                if (rays[r][i] == turretObj) return (r, i);
+        return (-1, -1);
+    }
 }

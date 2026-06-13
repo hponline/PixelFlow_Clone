@@ -1,4 +1,4 @@
-using Lean.Pool;
+﻿using Lean.Pool;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -94,10 +94,40 @@ public class LevelManager : MonoBehaviour
         };
 
         TurretManager.Instance.SetGridContext(gridContext);
-        DistributeTurrets();
+
+        if (levelData.turrets != null && levelData.turrets.Length > 0)
+            SpawnTurretsFromData(levelData.turrets);
+        else
+            DistributeTurrets();
     }
 
-    void DistributeTurrets() // Mermi da��t�m
+    void SpawnTurretsFromData(TurretLinkData[] turretDataArray)
+    {
+        // id → Turret instance map
+        Dictionary<int, Turret> spawnedMap = new Dictionary<int, Turret>();
+
+        foreach (var data in turretDataArray)
+        {
+            ColorType color = (ColorType)data.color;
+            Turret turret = TurretManager.Instance.SpawnTurretWithAmmo(color, data.ammo);
+            spawnedMap[data.id] = turret;
+        }
+
+        // Link pass — her iki taraf spawn olduktan sonra
+        foreach (var data in turretDataArray)
+        {
+            if (data.linkedTo == -1) continue;
+            if (!spawnedMap.TryGetValue(data.id, out var turret)) continue;
+            if (!spawnedMap.TryGetValue(data.linkedTo, out var target)) continue;
+
+            var link = turret.GetComponent<TurretLink>();
+            if (link == null || link.HasLink) continue;
+
+            link.Link(target);
+        }
+    }
+
+    void DistributeTurrets() // Mermi dağıtım
     {
         List<Turret> spawnedTurrets = new List<Turret>();
 
@@ -122,23 +152,40 @@ public class LevelManager : MonoBehaviour
 
     void LinkTurrets(List<Turret> turrets)
     {
-        ShuffleTurrets(turrets);
-
-        for (int i = 0; i + 1 < turrets.Count; i += 2)
+        foreach (var turret in turrets)
         {
-            if (UnityEngine.Random.value <= linkChance)
-                turrets[i].GetComponent<TurretLink>().Link(turrets[i + 1]);
+            if (turret.GetComponent<TurretLink>().HasLink) continue;
+
+            // Sağındaki veya arkasındaki komşuyu bul
+            Turret neighbor = TurretInventory.Instance.GetNeighbor(turret.gameObject);
+
+            if (neighbor != null && !neighbor.GetComponent<TurretLink>().HasLink)
+            {
+                if (UnityEngine.Random.value <= linkChance)
+                    turret.GetComponent<TurretLink>().Link(neighbor);
+            }
         }
     }
 
-    void ShuffleTurrets(List<Turret> list)
-    {
-        for (int i = list.Count - 1; i > 0; i--)
-        {
-            int j = UnityEngine.Random.Range(0, i + 1);
-            (list[i], list[j]) = (list[j], list[i]);
-        }
-    }
+    //void LinkTurrets(List<Turret> turrets)
+    //{
+    //    ShuffleTurrets(turrets);
+
+    //    for (int i = 0; i + 1 < turrets.Count; i += 2)
+    //    {
+    //        if (UnityEngine.Random.value <= linkChance)
+    //            turrets[i].GetComponent<TurretLink>().Link(turrets[i + 1]);
+    //    }
+    //}
+
+    //void ShuffleTurrets(List<Turret> list)
+    //{
+    //    for (int i = list.Count - 1; i > 0; i--)
+    //    {
+    //        int j = UnityEngine.Random.Range(0, i + 1);
+    //        (list[i], list[j]) = (list[j], list[i]);
+    //    }
+    //}
 
     Dictionary<int, int> CountTiles(int[] tiles)
     {
