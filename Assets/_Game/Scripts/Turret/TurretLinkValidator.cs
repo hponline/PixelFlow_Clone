@@ -1,30 +1,16 @@
-using System.Collections.Generic;
 using UnityEngine;
 
-public class LinkValidator
+public static class LinkValidator
 {
-    public static bool IsLinkValid(
-        GameObject turretObj,
-        GameObject linkedObj,
-        List<List<GameObject>> rays)
+    public static bool IsLinkValid(int rayA, int indexA, int rayB, int indexB)
     {
-        int rayA = -1, indexA = -1;
-        int rayB = -1, indexB = -1;
-
-        for (int r = 0; r < rays.Count; r++)
-        {
-            for (int i = 0; i < rays[r].Count; i++)
-            {
-                if (rays[r][i] == turretObj) { rayA = r; indexA = i; }
-                if (rays[r][i] == linkedObj) { rayB = r; indexB = i; }
-            }
-        }
-
         if (rayA == -1 || rayB == -1) return false;
 
-        bool yanYana = rayA != rayB && indexA == indexB;
-        bool arkaArkaya = rayA == rayB && Mathf.Abs(indexA - indexB) == 1;
+        // Chebyshev(8yönlü) mesafe hesabýnda birleþtiriyoruz
+        int distance = Mathf.Max(Mathf.Abs(rayA - rayB), Mathf.Abs(indexA - indexB));
 
-        return yanYana || arkaArkaya;
+        // Eðer mesafe tam olarak 1 ise; bu noktalar yatay, dikey veya çapraz komþudur.
+        // Eðer mesafe 0 ise (ayný nokta) veya 1'den büyükse (uzak) false döner.
+        return distance == 1;
     }
 }

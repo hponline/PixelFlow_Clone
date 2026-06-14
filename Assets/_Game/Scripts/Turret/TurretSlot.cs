@@ -52,27 +52,36 @@ public class TurretSlot : MonoBehaviour, IClickable
         currentTurret.transform.SetParent(null);
         currentTurret = null;
     }
+    public void ClearForCompact()
+    {
+        if (currentTurret == null) return;
+        isFull = false;
+        _collider.enabled = false;
+        currentTurret.transform.DOKill();
+        currentTurret = null;
+    }
 
     public void OnClick()
     {
         if (!isFull) return;
 
         Turret turret = currentTurret;
-        var link = turret.GetComponent<TurretLink>();
-        bool hasLink = link != null && link.HasLink;
 
+        bool hasLink = turret.HasLink;
         int requiredPlates = hasLink ? 2 : 1;
         if (!TurretManager.Instance.HasFreePlates(requiredPlates)) return;
 
-        // Linked turret'i slottan çýkar
         if (hasLink)
         {
-            TurretSlot linkedSlot = TurretSlotManager.Instance.GetSlotOf(link.LinkedTurret);
-            linkedSlot?.ClearState();
+            TurretSlot linkedSlot = TurretSlotManager.Instance.GetSlotOf(turret.LinkedTurret);
+            if (linkedSlot != null)
+            {
+                linkedSlot.ClearState();
+            }
         }
 
         ClearState();
-        TurretSlotManager.Instance.CompactSlots(slotIndex);
+        TurretSlotManager.Instance.CompactSlots();
         turret.SendToSplineWithLink();
     }
 }

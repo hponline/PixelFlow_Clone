@@ -213,10 +213,11 @@ GameObject:
   m_Component:
   - component: {fileID: 3450394646212009779}
   - component: {fileID: 2329293766070656251}
-  - component: {fileID: -584234911603423448}
   - component: {fileID: 5125078152789073805}
-  - component: {fileID: -4729243357825398234}
   - component: {fileID: -5233583322883378458}
+  - component: {fileID: 4604066947814465791}
+  - component: {fileID: -584234911603423448}
+  - component: {fileID: -4729243357825398234}
   m_Layer: 6
   m_Name: Turret_
   m_TagString: Untagged
@@ -256,9 +257,49 @@ MonoBehaviour:
   turretSO: {fileID: 11400000, guid: 1d4d00f23a4e954439ad16d950bd8902, type: 2}
   projectilePrefab: {fileID: 633285130601763063, guid: 747e9320b429ac242aa86c55aea5f554, type: 3}
   firePoint: {fileID: 8978166095894519949}
+  turretShooter: {fileID: 4604066947814465791}
   projectileMagazine: 5
   magazineTxt: {fileID: 5094581320600697096}
   currentState: 0
+--- !u!114 &5125078152789073805
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5670566829864819776}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 55353b3d485b35c4e9d9c3f8920646c3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TurretLink
+  linkedTurret: {fileID: 2329293766070656251}
+--- !u!114 &-5233583322883378458
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5670566829864819776}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: da8a804fd6b02ee4495b7e0234a15d5b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TurretLinkVisual
+  offset: {x: 0, y: 0.2, z: 0}
+--- !u!114 &4604066947814465791
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5670566829864819776}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 38ab27fb09415dc4890ca78210f5abb6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TurretShooter
+  turret: {fileID: 2329293766070656251}
 --- !u!65 &-584234911603423448
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -280,19 +321,6 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &5125078152789073805
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5670566829864819776}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 55353b3d485b35c4e9d9c3f8920646c3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::TurretLink
-  linkedTurret: {fileID: 2329293766070656251}
 --- !u!120 &-4729243357825398234
 LineRenderer:
   serializedVersion: 3
@@ -403,19 +431,6 @@ LineRenderer:
   m_UseWorldSpace: 1
   m_Loop: 0
   m_ApplyActiveColorSpace: 1
---- !u!114 &-5233583322883378458
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5670566829864819776}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: da8a804fd6b02ee4495b7e0234a15d5b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::TurretLinkVisual
-  offset: {x: 0, y: 0.2, z: 0}
 --- !u!1 &7434315461489343951
 GameObject:
   m_ObjectHideFlags: 0

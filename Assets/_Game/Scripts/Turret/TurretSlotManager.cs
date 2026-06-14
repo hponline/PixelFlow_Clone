@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+ï»¿using System.Collections.Generic;
 using UnityEngine;
 
 public class TurretSlotManager : MonoBehaviour
@@ -24,26 +24,24 @@ public class TurretSlotManager : MonoBehaviour
         return false;
     }
 
-    public void CompactSlots(int fromIndex, int secondIndex = -1)
+    public void CompactSlots()
     {
         isCompacting = true;
 
-        // Ýki boþluk varsa küçük index'ten büyüðe sýrala
-        List<int> emptyIndices = new List<int> { fromIndex };
-        if (secondIndex >= 0) emptyIndices.Add(secondIndex);
-        emptyIndices.Sort();
+        int writeIndex = 0;
 
-        // Her boþluk için sola kaydýr
-        foreach (int emptyIndex in emptyIndices)
+        for (int readIndex = 0; readIndex < turretSlots.Length; readIndex++)
         {
-            for (int i = emptyIndex; i < turretSlots.Length - 1; i++)
-            {
-                if (!turretSlots[i + 1].isFull) break;
+            if (!turretSlots[readIndex].isFull) continue;
 
-                Turret t = turretSlots[i + 1].CurrentTurret;
-                turretSlots[i + 1].ClearState();
-                turretSlots[i].Place(t, isCompacting: true);
+            if (readIndex != writeIndex)
+            {
+                Turret t = turretSlots[readIndex].CurrentTurret;
+                turretSlots[readIndex].ClearForCompact();
+                turretSlots[writeIndex].Place(t, isCompacting: true);
             }
+
+            writeIndex++;
         }
 
         isCompacting = false;
