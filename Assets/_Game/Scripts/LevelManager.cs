@@ -154,16 +154,16 @@ public class LevelManager : MonoBehaviour
     {
         foreach (var turret in turrets)
         {
-            if (turret.GetComponent<TurretLink>().HasLink) continue;
+            var link = turret.GetComponent<TurretLink>();
+            if (link == null || link.HasLink) continue;
 
-            // Sağındaki veya arkasındaki komşuyu bul
             Turret neighbor = TurretInventory.Instance.GetNeighbor(turret.gameObject);
+            if (neighbor == null) continue;
 
-            if (neighbor != null && !neighbor.GetComponent<TurretLink>().HasLink)
-            {
+            var neighborLink = neighbor.GetComponent<TurretLink>();
+            if (neighborLink == null || neighborLink.HasLink) continue;
                 if (UnityEngine.Random.value <= linkChance)
-                    turret.GetComponent<TurretLink>().Link(neighbor);
-            }
+                    link.Link(neighbor);
         }
     }
 
