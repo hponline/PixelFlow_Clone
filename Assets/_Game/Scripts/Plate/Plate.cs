@@ -9,7 +9,7 @@ public class Plate : MonoBehaviour
     [SerializeField] private Transform mountPoint;
     [SerializeField] private Transform visual;
 
-    PlatePool platePool;
+    PlatePoolManager platePool;
     Turret currentTurret;
     Action onMountComplete;
 
@@ -23,7 +23,7 @@ public class Plate : MonoBehaviour
         startRot = transform.rotation;
     }
 
-    public void Init(SplineComputer spline, float speed, Turret turret, PlatePool pool, Action onComplete = null)
+    public void Init(SplineComputer spline, float speed, Turret turret, PlatePoolManager pool, Action onComplete = null)
     {
         platePool = pool;
         onMountComplete = onComplete;

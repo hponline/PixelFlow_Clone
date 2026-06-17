@@ -68,7 +68,7 @@ public class TurretInventory : MonoBehaviour
             if (!ray[i].TryGetComponent<Turret>(out var turret)) continue;
 
             bool isFirst = i == 0;
-            if(!turret.HasLink)
+            if (!turret.HasLink)
             {
                 turret.SetClickable(isFirst);
                 continue;
@@ -97,7 +97,7 @@ public class TurretInventory : MonoBehaviour
         (-1,  1), // sol-arka çapraz
         ( 1, -1), // sað-ön çapraz
         (-1, -1), // sol-ön çapraz
-    };
+        };
 
         foreach (var (dr, di) in directions)
         {
