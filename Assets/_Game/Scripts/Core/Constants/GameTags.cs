@@ -5,4 +5,14 @@ public static class GameTags
         public const float DOTWEEN_ANIM_DURATION = 0.3f;
         public const float DOTWEEN_BLOCK_DEAD_DURATION = 0.2f;
     }
+
+    public static class PlayerPrefsKeys
+    {
+        public const string UNLIMITED_LIVES_EXPIRY = "UnlimitedLivesExpiry";
+        public const string CURRENT_LIFE = "CurrentLife";
+        public const string NEXT_LIFE_TIME = "NextLifeTime";
+        public const string SAVED_LEVEL = "SavedLevel";
+        public const string PLAYER_COIN = "PlayerCoins";
+
+    }
 }

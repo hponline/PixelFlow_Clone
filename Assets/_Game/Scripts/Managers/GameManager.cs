@@ -28,8 +28,7 @@ public class GameManager : MonoBehaviour
 
     void Setup()
     {
-        // can haklarý prefsten çekilecek
-        currentLife = maxLife;
+        currentLife = DataManager.Instance.currentLife;
     }
 
     [Button]

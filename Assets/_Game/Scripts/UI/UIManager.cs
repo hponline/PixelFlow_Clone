@@ -1,4 +1,5 @@
 using DG.Tweening;
+using System;
 using UnityEngine;
 
 public class UIManager : MonoBehaviour
@@ -7,7 +8,6 @@ public class UIManager : MonoBehaviour
 
     public GameObject[] panels;
 
-    [SerializeField] float dotweenDuration = 0.4f;
 
     [Header("UIPanels")]
     [SerializeField] GameObject settingPanel;
@@ -50,11 +50,11 @@ public class UIManager : MonoBehaviour
         }
     }
 
-    private void PanelPunchAnimation(GameObject rectTransform)
+    public void PanelPunchAnimation(GameObject rectTransform)
     {
         rectTransform.transform.DOKill(true);
         rectTransform.transform.localScale = Vector3.one;
-        rectTransform.transform.DOPunchScale(new Vector3(0.3f, 0.3f, 0.3f), dotweenDuration, 5, 1f);
+        rectTransform.transform.DOPunchScale(new Vector3(0.3f, 0.3f, 0.3f), GameTags.Animation.DOTWEEN_ANIM_DURATION, 5, 1f);
     }
 
     #region UIButton
