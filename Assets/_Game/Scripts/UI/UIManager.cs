@@ -22,10 +22,14 @@ public class UIManager : MonoBehaviour
     private void OnEnable()
     {
         GameEvent.OnGameLose += HandleLosePanel;
+        GameEvent.OnGameRestart += ClosePanel;
+
+
     }
     private void OnDisable()
     {
         GameEvent.OnGameLose -= HandleLosePanel;
+        GameEvent.OnGameRestart -= ClosePanel;
     }
 
     void HandleLosePanel()

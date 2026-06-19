@@ -30,7 +30,14 @@ public class LevelManager : MonoBehaviour
 
     void Start()
     {
-        LoadLevel(currentLevel);
+        LoadLevel(currentLevel); // playerprefs
+    }
+
+    public void NextLevel(int level)
+    {
+        // if max level 
+        GameEvent.TriggerLevelChanged(level);
+        LoadLevel(level);
     }
 
     public void LoadLevel(int levelIndex)

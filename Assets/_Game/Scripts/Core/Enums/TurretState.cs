@@ -1,0 +1,1 @@
+public enum TurretState { InInventory, InSlot, OnPlate, Despawning }

@@ -5,18 +5,16 @@ public class UICoinNumber : MonoBehaviour
 {
     [SerializeField] TextMeshProUGUI coinTxt;
 
-    private void Awake()
+    private void Start()
     {
         coinTxt.SetText("{0}", DataManager.Instance.currentCoin);
+        
+        GameEvent.OnCoinChanged += UpdateCoin;
     }
 
-    private void OnEnable()
-    {
-        CoinManager.Instance.OnCoinChanged += UpdateCoin;
-    }
     private void OnDisable()
     {
-        CoinManager.Instance.OnCoinChanged -= UpdateCoin;
+        GameEvent.OnCoinChanged -= UpdateCoin;
     }
 
     void UpdateCoin(int amount)

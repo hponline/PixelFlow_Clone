@@ -10,7 +10,6 @@ public class GameManager : MonoBehaviour
     [SerializeField] int maxLife;
     [SerializeField] int currentLife;
 
-    public event Action<int> OnLivesChanged;
     public bool HasEnoughLife() => currentLife > 0;
     public int CurrentLife => currentLife;
 
@@ -35,7 +34,7 @@ public class GameManager : MonoBehaviour
     public void SpendLife()
     {
         currentLife--;
-        OnLivesChanged?.Invoke(currentLife);
+        GameEvent.TriggerLivesChanged(currentLife);
 
         if (!HasEnoughLife())
         {

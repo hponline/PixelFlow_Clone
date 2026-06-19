@@ -1,19 +1,14 @@
 using UnityEngine;
-using System;
 using NaughtyAttributes;
 
 public class CoinManager : MonoBehaviour
 {
     public static CoinManager Instance { get; private set; }
 
-    public event Action<int> OnCoinChanged;
-    public event Action OnCoinsSpent;
-
     public bool HasEnoughCoins(float amount) => DataManager.Instance.currentCoin >= amount;
 
     public int CurrentCoins => DataManager.Instance.currentCoin;
 
-    public 
 
     void Awake()
     {
@@ -24,7 +19,7 @@ public class CoinManager : MonoBehaviour
     {
         DataManager.Instance.currentCoin += amount;
         DataManager.Instance.SaveGame();
-        OnCoinChanged?.Invoke(CurrentCoins);
+        GameEvent.TriggerCoinChanged(CurrentCoins);        
     }
 
     [Button]
@@ -32,7 +27,7 @@ public class CoinManager : MonoBehaviour
     {
         DataManager.Instance.currentCoin += 5000;
         DataManager.Instance.SaveGame();
-        OnCoinChanged?.Invoke(CurrentCoins);
+        GameEvent.TriggerCoinChanged(CurrentCoins);
     }
 
 
@@ -42,8 +37,9 @@ public class CoinManager : MonoBehaviour
 
         DataManager.Instance.currentCoin -= amount;
         DataManager.Instance.SaveGame();
-        OnCoinChanged?.Invoke(CurrentCoins);
-        OnCoinsSpent?.Invoke();
+        GameEvent.TriggerCoinChanged(CurrentCoins);
+        GameEvent.TriggerCoinSpendChanged();
+
         return true;
     }
 

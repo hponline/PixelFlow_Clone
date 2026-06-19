@@ -5,12 +5,19 @@ public class UILevelNumber : MonoBehaviour
 {
     [SerializeField] TextMeshProUGUI levelTxt;
 
-    private void Awake()
+    private void Start()
     {
+        GameEvent.OnLevelChanged += OnLevelChanged;
+
         SetText();
     }
 
-    private void OnEnable()
+    private void OnDisable()
+    {
+        GameEvent.OnLevelChanged -= OnLevelChanged;
+    }
+
+    void OnLevelChanged(int level)
     {
         SetText();
     }

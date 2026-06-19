@@ -4,29 +4,27 @@ using DG.Tweening;
 using TMPro;
 using System;
 
-public enum TurretState { InInventory, InSlot, OnPlate, Despawning }
-public enum GridSide { None, Bottom, Top, Left, Right }
 [RequireComponent(typeof(Collider))]
 public class Turret : MonoBehaviour, IClickable
 {
     public event Action<TurretState, TurretState> OnStateChanged;
-    event Action<int> OnProjectileFired;
+    //public event Action<int> OnTurretFired;
 
     [Header("References")]
     public TurretSOData turretSO;
     public GameObject projectilePrefab;
     public Transform firePoint;
-    [SerializeField] TurretShooter turretShooter;
 
     [Header("UI")]
     public int projectileMagazine;
-    public TextMeshProUGUI magazineTxt;
+    [SerializeField] TextMeshProUGUI magazineTxt;
 
     float animDuration = GameTags.Animation.DOTWEEN_ANIM_DURATION;
     Plate currentPlate;
     GridContext gridContext;
     Collider _collider;
     TurretLink turretLink;
+    TurretShooter turretShooter;
 
     [SerializeField] TurretState currentState;
     public void SetPlate(Plate plate) => currentPlate = plate;
@@ -88,7 +86,8 @@ public class Turret : MonoBehaviour, IClickable
     public void Shot()
     {
         projectileMagazine--;
-        OnProjectileFired?.Invoke(projectileMagazine);
+        //OnTurretFired?.Invoke(projectileMagazine);
+        GameEvent.TriggerTurretFired();
 
         transform.DOKill(true);
         transform.DOPunchScale(Vector3.one * 0.4f, 0.2f, vibrato: 1, elasticity: 0.1f);
@@ -157,7 +156,7 @@ public class Turret : MonoBehaviour, IClickable
 
     void UpdateMagazineUI()
     {
-        magazineTxt.SetText(projectileMagazine.ToString());
+        magazineTxt.SetText("{0}", projectileMagazine);
     }
 
 
@@ -211,10 +210,12 @@ public class Turret : MonoBehaviour, IClickable
 
     private void OnEnable()
     {
-        OnProjectileFired += UpdateMagazineCount;
+        //OnTurretFired += UpdateMagazineCount;
+        GameEvent.OnTurretFired += UpdateMagazineUI;
     }
     private void OnDisable()
     {
-        OnProjectileFired -= UpdateMagazineCount;
+        GameEvent.OnTurretFired -= UpdateMagazineUI;
+        //OnTurretFired -= UpdateMagazineCount;
     }
 }
