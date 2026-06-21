@@ -13,6 +13,10 @@ public class UIManager : MonoBehaviour
     [SerializeField] GameObject settingPanel;
     [SerializeField] GameObject coinPanel;
     [SerializeField] GameObject losePanel;
+    [SerializeField] GameObject boosterPlatePanel;
+    [SerializeField] GameObject boosterPanel2;
+    [SerializeField] GameObject boosterPanel3;
+
 
     private void Awake()
     {
@@ -22,6 +26,7 @@ public class UIManager : MonoBehaviour
     private void OnEnable()
     {
         GameEvent.OnGameLose += HandleLosePanel;
+        GameEvent.OnLevelLose += HandleLosePanel;
         GameEvent.OnGameRestart += ClosePanel;
 
 
@@ -29,11 +34,13 @@ public class UIManager : MonoBehaviour
     private void OnDisable()
     {
         GameEvent.OnGameLose -= HandleLosePanel;
+        GameEvent.OnLevelLose -= HandleLosePanel;
         GameEvent.OnGameRestart -= ClosePanel;
     }
 
     void HandleLosePanel()
     {
+        if (losePanel.activeInHierarchy) return;
         ShowPanel(losePanel);
     }
 
@@ -62,6 +69,11 @@ public class UIManager : MonoBehaviour
     }
 
     #region UIButton
+
+    public void BoosterPlateButton()
+    {
+        ShowPanel(boosterPlatePanel);
+    }
 
     public void SettingButton()
     {

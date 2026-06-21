@@ -26,20 +26,17 @@ public class LevelManager : MonoBehaviour
     Dictionary<int, int> tileCounts;
     int remainingBlocks;
 
-    public event Action OnLevelCompleted;
-    public event Action OnLevelLose;
-
     private void Awake() => Instance = this;
 
     private void OnEnable()
     {
         Block.OnBlockDestroyed += HandleBlockDestroyed;
-        TurretSlotManager.OnSlotFull += HandleSlotsFull;
+        GameEvent.OnSlotFull += HandleSlotsFull;
     }
     private void OnDisable()
     {
         Block.OnBlockDestroyed -= HandleBlockDestroyed;
-        TurretSlotManager.OnSlotFull -= HandleSlotsFull;
+        GameEvent.OnSlotFull -= HandleSlotsFull;
     }
 
     void Start()
@@ -50,13 +47,13 @@ public class LevelManager : MonoBehaviour
     void CompleteLevel()
     {
         Debug.Log("Level Win");
-        OnLevelCompleted?.Invoke();
+        GameEvent.TriggerLevelCompleted();
     }
 
     void LoseLevel()
     {
         Debug.Log("Level Lose — slotlar dolu");
-        OnLevelLose?.Invoke();
+        GameEvent.TriggerLevelLose();
     }
 
     void HandleSlotsFull()

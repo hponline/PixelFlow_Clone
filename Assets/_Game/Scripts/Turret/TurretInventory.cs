@@ -73,10 +73,12 @@ public class TurretInventory : MonoBehaviour
                 turret.SetClickable(isFirst);
                 continue;
             }
+
             var (linkedRay, linkedIndex) = GetPosition(turret.LinkedTurret.gameObject);
+            bool linkedIsFirst = linkedIndex == 0;
             bool linkValid = LinkValidator.IsLinkValid(rayIndex, i, linkedRay, linkedIndex);
 
-            turret.SetClickable(isFirst && linkValid);
+            turret.SetClickable(isFirst && linkedIsFirst && linkValid);
         }
     }
 

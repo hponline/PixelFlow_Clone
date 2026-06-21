@@ -8,6 +8,7 @@ public class PlatePoolManager : MonoBehaviour
 {
     [SerializeField] Plate[] platePlace;
     [SerializeField] Transform container;
+    [SerializeField] PlateSO plateSO;
 
     [Header("UI")]
     [SerializeField] TextMeshPro plateCounterTxt;
@@ -17,8 +18,6 @@ public class PlatePoolManager : MonoBehaviour
     public int AvailableCount => availablePlates.Count;
 
     Queue<Plate> availablePlates = new();
-
-    public Action OnChangedPlateCount;
 
     private void Awake()
     {
@@ -30,11 +29,11 @@ public class PlatePoolManager : MonoBehaviour
     }
     private void OnEnable()
     {
-        OnChangedPlateCount += HandlePlateCount;
+        GameEvent.OnPlateCountChanged += HandlePlateCount;
     }
     private void OnDisable()
     {
-        OnChangedPlateCount -= HandlePlateCount;
+        GameEvent.OnPlateCountChanged -= HandlePlateCount;
     }
 
     public bool TryGetPlate(out Plate plate)
@@ -43,7 +42,7 @@ public class PlatePoolManager : MonoBehaviour
         {
             plate = availablePlates.Dequeue();
             currentPlate--;
-            OnChangedPlateCount?.Invoke();
+            GameEvent.TriggerPlateChanged();
             return true;
         }
         plate = null;
@@ -54,14 +53,27 @@ public class PlatePoolManager : MonoBehaviour
     {
         availablePlates.Enqueue(plate);
         currentPlate++;
-        OnChangedPlateCount?.Invoke();
+        GameEvent.TriggerPlateChanged();
     }
 
     [Button]
-    public void BuyPlate()
+    public void AddPlate()
     {
         currentPlate = Mathf.Min(currentPlate + +1);
-        OnChangedPlateCount?.Invoke();
+        GameEvent.TriggerPlateChanged();
+    }
+
+    public void BuyPlate()
+    {
+        if (!CoinManager.Instance.HasEnoughCoins(plateSO.platePrice)) return;
+
+        CoinManager.Instance.SpendCoins(plateSO.platePrice);
+
+        // LeanPool ile plate önceden oluþtur sonra kullanýcýya ver
+
+        maxPlate++;
+        currentPlate++;
+        GameEvent.TriggerPlateChanged();
     }
 
     void HandlePlateCount()

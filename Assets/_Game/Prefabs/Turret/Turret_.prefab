@@ -257,7 +257,6 @@ MonoBehaviour:
   turretSO: {fileID: 11400000, guid: 1d4d00f23a4e954439ad16d950bd8902, type: 2}
   projectilePrefab: {fileID: 633285130601763063, guid: 747e9320b429ac242aa86c55aea5f554, type: 3}
   firePoint: {fileID: 8978166095894519949}
-  turretShooter: {fileID: 4604066947814465791}
   projectileMagazine: 5
   magazineTxt: {fileID: 5094581320600697096}
   currentState: 0
@@ -442,7 +441,6 @@ GameObject:
   - component: {fileID: 7701799917926669604}
   - component: {fileID: 1711870920140530938}
   - component: {fileID: 5190147065074757784}
-  - component: {fileID: 5207619824313673893}
   m_Layer: 6
   m_Name: Canvas
   m_TagString: Untagged
@@ -516,23 +514,6 @@ MonoBehaviour:
   m_DefaultSpriteDPI: 96
   m_DynamicPixelsPerUnit: 1
   m_PresetInfoIsWorld: 1
---- !u!114 &5207619824313673893
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7434315461489343951}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: dc42784cf147c0c48a680349fa168899, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.GraphicRaycaster
-  m_IgnoreReversedGraphics: 1
-  m_BlockingObjects: 0
-  m_BlockingMask:
-    serializedVersion: 2
-    m_Bits: 4294967295
 --- !u!1 &7589257893474459034
 GameObject:
   m_ObjectHideFlags: 0

@@ -5,7 +5,6 @@ using UnityEngine;
 public class TurretSlotManager : MonoBehaviour
 {
     public static TurretSlotManager Instance;
-    public static event Action OnSlotFull;
 
     public TurretSlot[] turretSlots;
     bool isCompacting = false;
@@ -25,7 +24,7 @@ public class TurretSlotManager : MonoBehaviour
             }
         }
 
-        OnSlotFull?.Invoke();
+        GameEvent.TriggerSlotFull();
         return false;
     }
 

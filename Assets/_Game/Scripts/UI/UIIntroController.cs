@@ -7,7 +7,7 @@ public class UIIntroController : MonoBehaviour, IUIScreen
     [SerializeField] RectTransform botSide;
 
     [SerializeField] Vector3 topSideTargetY = new Vector3(0, -80, 0);
-    [SerializeField] Vector3 botSideTargetY = new Vector3(0, 60, 0);
+    [SerializeField] Vector3 botSideTargetY = new Vector3(0, 0, 0);
 
     [SerializeField, Range(0,1)] float duration = 0.5f;
     [SerializeField] Ease ease = Ease.OutCubic;
