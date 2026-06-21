@@ -1,9 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class TurretSlotManager : MonoBehaviour
 {
     public static TurretSlotManager Instance;
+    public static event Action OnSlotFull;
+
     public TurretSlot[] turretSlots;
     bool isCompacting = false;
 
@@ -21,6 +24,8 @@ public class TurretSlotManager : MonoBehaviour
                 return true;
             }
         }
+
+        OnSlotFull?.Invoke();
         return false;
     }
 

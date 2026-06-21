@@ -14,7 +14,6 @@ public class LevelManager : MonoBehaviour
     public LevelList levelList;
     [SerializeField] int currentLevel = 0;
 
-    public int CurrentLevel => currentLevel;
     public Block[,] grid;
     public Grid gridComponent;
     public int turretMaxAmmo;
@@ -25,12 +24,53 @@ public class LevelManager : MonoBehaviour
 
     GridContext gridContext;
     Dictionary<int, int> tileCounts;
+    int remainingBlocks;
+
+    public event Action OnLevelCompleted;
+    public event Action OnLevelLose;
 
     private void Awake() => Instance = this;
+
+    private void OnEnable()
+    {
+        Block.OnBlockDestroyed += HandleBlockDestroyed;
+        TurretSlotManager.OnSlotFull += HandleSlotsFull;
+    }
+    private void OnDisable()
+    {
+        Block.OnBlockDestroyed -= HandleBlockDestroyed;
+        TurretSlotManager.OnSlotFull -= HandleSlotsFull;
+    }
 
     void Start()
     {
         LoadLevel(currentLevel); // playerprefs
+    }
+
+    void CompleteLevel()
+    {
+        Debug.Log("Level Win");
+        OnLevelCompleted?.Invoke();
+    }
+
+    void LoseLevel()
+    {
+        Debug.Log("Level Lose — slotlar dolu");
+        OnLevelLose?.Invoke();
+    }
+
+    void HandleSlotsFull()
+    {
+        LoseLevel();
+    }
+
+    void HandleBlockDestroyed(Block block)
+    {
+        grid[block.gridX, block.gridZ] = null;
+        remainingBlocks--;
+
+        if (remainingBlocks <= 0)
+            CompleteLevel();
     }
 
     public void NextLevel(int level)
@@ -60,6 +100,7 @@ public class LevelManager : MonoBehaviour
         if (levelData.tiles.Length != expected) return;
 
         grid = new Block[levelData.width, levelData.height];
+        remainingBlocks = 0;
 
         for (int y = 0; y < levelData.height; y++)
         {
@@ -91,6 +132,7 @@ public class LevelManager : MonoBehaviour
                 _block.gridX = x;
                 _block.gridZ = y;
                 grid[x, y] = _block;
+                remainingBlocks++;
             }
         }
         gridContext = new GridContext

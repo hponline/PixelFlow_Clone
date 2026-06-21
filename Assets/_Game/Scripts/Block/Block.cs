@@ -1,8 +1,11 @@
 using DG.Tweening;
+using System;
 using UnityEngine;
 
 public class Block : MonoBehaviour
 {
+    public static event Action<Block> OnBlockDestroyed;
+
     public ColorType blockColor;
     public bool isShot = false;
     public int ring;
@@ -14,8 +17,8 @@ public class Block : MonoBehaviour
     {
         transform.DOScale(0, GameTags.Animation.DOTWEEN_BLOCK_DEAD_DURATION).SetEase(Ease.InBack).OnComplete(() =>
         {
+            OnBlockDestroyed?.Invoke(this);
             Lean.Pool.LeanPool.Despawn(gameObject);
-            LevelManager.Instance.grid[gridX, gridZ] = null;
         });
     }
 }
