@@ -1,7 +1,8 @@
 using DG.Tweening;
+using System;
 using UnityEngine;
 
-public class UIIntroController : MonoBehaviour, IUIScreen
+public class UIIntroController : MonoBehaviour
 {
     [SerializeField] RectTransform topSide;
     [SerializeField] RectTransform botSide;
@@ -15,10 +16,11 @@ public class UIIntroController : MonoBehaviour, IUIScreen
     Vector3 startTopSidePos;
     Vector3 startBotSidePos;
 
+
     private void Awake()
     {
-        startTopSidePos = transform.position;
-        startBotSidePos = transform.position;
+        startTopSidePos = topSide.anchoredPosition;
+        startBotSidePos = botSide.anchoredPosition;
     }
 
     private void Start()
@@ -26,7 +28,7 @@ public class UIIntroController : MonoBehaviour, IUIScreen
         Show();
     }
 
-    public void Show()
+    void Show()
     {
         Sequence seq = DOTween.Sequence();
 
@@ -34,12 +36,20 @@ public class UIIntroController : MonoBehaviour, IUIScreen
         seq.Join(botSide.DOAnchorPos(botSideTargetY, duration)).SetEase(ease);
     }
 
-    public void Hide()
+    void Hide()
     {
         Sequence seq = DOTween.Sequence();
 
         seq.Join(topSide.DOAnchorPos(startTopSidePos, duration)).SetEase(ease);
-        seq.Join(topSide.DOAnchorPos(startBotSidePos, duration)).SetEase(ease);
+        seq.Join(botSide.DOAnchorPos(startBotSidePos, duration)).SetEase(ease);
+    }
+
+    public void ShowPanel(bool open)
+    {
+        if (open)
+            Show();
+        else
+            Hide();
     }
 
 }

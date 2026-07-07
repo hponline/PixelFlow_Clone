@@ -16,6 +16,7 @@ public static class GameEvent
     public static event Action OnSlotFull;
     public static event Action OnPlateCountChanged;
 
+
     public static void TriggerGameRestart() => OnGameRestart?.Invoke();
     public static void TriggerGameLose() => OnGameLose?.Invoke();
 

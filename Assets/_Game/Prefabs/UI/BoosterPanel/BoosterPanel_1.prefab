@@ -312,7 +312,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 0.68235296}
-  m_RaycastTarget: 0
+  m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
@@ -1122,9 +1122,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: PlatePoolManager, Assembly-CSharp
-        m_MethodName: BuyPlate
+      - m_Target: {fileID: 9094247545572450889}
+        m_TargetAssemblyTypeName: UIBoosterPlate, Assembly-CSharp
+        m_MethodName: BuyBooster
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -1548,14 +1548,14 @@ GameObject:
   m_Component:
   - component: {fileID: 9116803689129791392}
   - component: {fileID: 7256572394198539675}
-  - component: {fileID: 7171527625266986026}
+  - component: {fileID: 9094247545572450889}
   m_Layer: 5
   m_Name: BoosterPanel_1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &9116803689129791392
 RectTransform:
   m_ObjectHideFlags: 0
@@ -1586,7 +1586,7 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7868102605401655456}
   m_CullTransparentMesh: 1
---- !u!114 &7171527625266986026
+--- !u!114 &9094247545572450889
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1595,9 +1595,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 7868102605401655456}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d5a2d6ac3d3a1a4408e64ac3b26acca8, type: 3}
+  m_Script: {fileID: 11500000, guid: 65d372187c111294a886b72ba649c0ca, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Booster_Plate
+  m_EditorClassIdentifier: Assembly-CSharp::UIBoosterPlate
+  boosterType: 1
+  amountTxt: {fileID: 9114543524123896760}
+  boosterSO: {fileID: 11400000, guid: 5e6eafcd675416d44b339b8bffb89c7e, type: 2}
 --- !u!1 &8647876288120339723
 GameObject:
   m_ObjectHideFlags: 0

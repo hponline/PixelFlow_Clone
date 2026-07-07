@@ -6,6 +6,8 @@ public class TurretInventory : MonoBehaviour
 {
     public static TurretInventory Instance;
 
+    [SerializeField] UIIntroController uIIntroController;
+
     [SerializeField] float slideDuration = GameTags.Animation.DOTWEEN_ANIM_DURATION;
     [SerializeField] private Ease slideEaseType = Ease.OutBack;
     [SerializeField] private Vector3 spacingOffset = new Vector3(0, 0, -2.5f);
@@ -36,7 +38,7 @@ public class TurretInventory : MonoBehaviour
             if (rays[i].Remove(turretObj))
             {
                 RefreshRay(i);
-                UpdateClickable(i);
+                RestoreDefaultClickable();
                 return;
             }
         }
@@ -76,12 +78,17 @@ public class TurretInventory : MonoBehaviour
 
             var (linkedRay, linkedIndex) = GetPosition(turret.LinkedTurret.gameObject);
             bool linkedIsFirst = linkedIndex == 0;
+            bool linkedBehind = linkedRay == rayIndex && linkedIndex == i + 1;
             bool linkValid = LinkValidator.IsLinkValid(rayIndex, i, linkedRay, linkedIndex);
 
-            turret.SetClickable(isFirst && linkedIsFirst && linkValid);
+            bool canClick =
+                isFirst &&
+                linkValid &&
+                (linkedIsFirst || linkedBehind);
+
+            turret.SetClickable(canClick);
         }
     }
-
 
     public Turret GetNeighbor(GameObject turretObj)
     {
@@ -89,7 +96,7 @@ public class TurretInventory : MonoBehaviour
         if (rayIndex == -1) return null;
 
         // 8 yön — öncelik sýrasý: sað, sol, arka, ön, çaprazlar
-        (int dr, int di)[] directions =
+        (int row, int column)[] directions =
         {
         ( 1,  0), // sað ray
         (-1,  0), // sol ray
@@ -101,10 +108,10 @@ public class TurretInventory : MonoBehaviour
         (-1, -1), // sol-ön çapraz
         };
 
-        foreach (var (dr, di) in directions)
+        foreach (var (row, column) in directions)
         {
-            int nr = rayIndex + dr;
-            int ni = itemIndex + di;
+            int nr = rayIndex + row;
+            int ni = itemIndex + column;
 
             if (nr < 0 || nr >= rays.Count) continue;
             if (ni < 0 || ni >= rays[nr].Count) continue;
@@ -128,5 +135,35 @@ public class TurretInventory : MonoBehaviour
             for (int i = 0; i < rays[r].Count; i++)
                 if (rays[r][i] == turretObj) return (r, i);
         return (-1, -1);
+    }
+
+    public void SetAllHighlighted(bool active)
+    {
+        foreach (var ray in rays)
+        {
+            foreach (var turretObj in ray)
+            {
+                turretObj.GetComponent<Turret>()?.SetClickable(active);
+                turretObj.GetComponentInChildren<TurretHighlight>()?.SetHighlighted(active);
+            }
+        }
+
+        if (!active)
+            RestoreDefaultClickable();
+
+        Debug.Log("Highlighted" + active);
+    }
+
+    public void ShowPanel(bool state)
+    {
+        uIIntroController.ShowPanel(state);
+    }
+
+    void RestoreDefaultClickable()
+    {
+        for (int i = 0; i < rays.Count; i++)
+        {
+            UpdateClickable(i);
+        }
     }
 }

@@ -8,7 +8,6 @@ using System;
 public class Turret : MonoBehaviour, IClickable
 {
     public event Action<TurretState, TurretState> OnStateChanged;
-    //public event Action<int> OnTurretFired;
 
     [Header("References")]
     public TurretSOData turretSO;
@@ -28,10 +27,10 @@ public class Turret : MonoBehaviour, IClickable
 
     [SerializeField] TurretState currentState;
     public void SetPlate(Plate plate) => currentPlate = plate;
-    public Plate GetPlate() => currentPlate;
     public void SetClickable(bool state) => _collider.enabled = state;
     public bool HasLink => turretLink != null && turretLink.HasLink;
     public Turret LinkedTurret => turretLink?.LinkedTurret;
+    public TurretState CurrentState => currentState;
 
     private void Awake()
     {
@@ -86,7 +85,6 @@ public class Turret : MonoBehaviour, IClickable
     public void Shot()
     {
         projectileMagazine--;
-        //OnTurretFired?.Invoke(projectileMagazine);
         GameEvent.TriggerTurretFired();
 
         transform.DOKill(true);
@@ -149,11 +147,6 @@ public class Turret : MonoBehaviour, IClickable
         });
     }
 
-    void UpdateMagazineCount(int remaining)
-    {
-        UpdateMagazineUI();
-    }
-
     void UpdateMagazineUI()
     {
         magazineTxt.SetText("{0}", projectileMagazine);
@@ -162,8 +155,15 @@ public class Turret : MonoBehaviour, IClickable
 
     #region Spline a yollama
 
-    // Inventory >>>> Spline
-    void SendLinkTurret()
+    // Slot >>>> Spline
+    public void SendToSplineWithLink()
+    {
+        if (!CanSendToSpline(out Turret linked)) return;
+        SendToSplineCore(linked);
+    }
+
+    // Inventory >>>> Spline // Booster için
+    public void SendLinkTurret()
     {
         if (!CanSendToSpline(out Turret linked)) return;
 
@@ -171,13 +171,6 @@ public class Turret : MonoBehaviour, IClickable
         if (linked != null)
             TurretInventory.Instance.RemoveTurret(linked.gameObject);
 
-        SendToSplineCore(linked);
-    }
-
-    // Slot >>>> Spline
-    public void SendToSplineWithLink()
-    {
-        if (!CanSendToSpline(out Turret linked)) return;
         SendToSplineCore(linked);
     }
 
@@ -202,6 +195,12 @@ public class Turret : MonoBehaviour, IClickable
 
     public void OnClick()
     {
+        if (BoosterSelectionManager.Instance.IsSelecting)
+        {
+            if(currentState == TurretState.InInventory)
+                BoosterSelectionManager.Instance.TrySelectTurret(this);
+            return;
+        }
         if (currentState != TurretState.InInventory) return;
 
         SendLinkTurret();
@@ -210,12 +209,10 @@ public class Turret : MonoBehaviour, IClickable
 
     private void OnEnable()
     {
-        //OnTurretFired += UpdateMagazineCount;
         GameEvent.OnTurretFired += UpdateMagazineUI;
     }
     private void OnDisable()
     {
         GameEvent.OnTurretFired -= UpdateMagazineUI;
-        //OnTurretFired -= UpdateMagazineCount;
     }
 }

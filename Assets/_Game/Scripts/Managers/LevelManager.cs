@@ -14,7 +14,7 @@ public class LevelManager : MonoBehaviour
     public LevelList levelList;
     [SerializeField] int currentLevel = 0;
 
-    public Block[,] grid;
+    [SerializeField] Block[,] grid;
     public Grid gridComponent;
     public int turretMaxAmmo;
 
@@ -26,7 +26,10 @@ public class LevelManager : MonoBehaviour
     Dictionary<int, int> tileCounts;
     int remainingBlocks;
 
-    private void Awake() => Instance = this;
+    private void Awake()
+    {
+        Instance = this;
+    }
 
     private void OnEnable()
     {
@@ -41,11 +44,14 @@ public class LevelManager : MonoBehaviour
 
     void Start()
     {
-        LoadLevel(currentLevel); // playerprefs
+        LoadLevel(DataManager.Instance.currentLevel);  
     }
 
     void CompleteLevel()
     {
+        int nextLvl = PlayerPrefs.GetInt(GameTags.PlayerPrefsKeys.CURRENT_LEVEL, 0) +1;
+        DataManager.Instance.SaveLevel(nextLvl);
+
         Debug.Log("Level Win");
         GameEvent.TriggerLevelCompleted();
     }
@@ -70,11 +76,16 @@ public class LevelManager : MonoBehaviour
             CompleteLevel();
     }
 
-    public void NextLevel(int level)
+    public void NextLevel()
     {
-        // if max level 
-        GameEvent.TriggerLevelChanged(level);
-        LoadLevel(level);
+        int nextLevel = DataManager.Instance.NextLevel;
+        LoadLevel(nextLevel);
+
+        GameEvent.TriggerLevelChanged(nextLevel);
+        UIManager.Instance.ClosePanel();
+
+        DataManager.Instance.SaveGame();
+        Debug.Log("Level değişti Şimdiki level: " + nextLevel);
     }
 
     public void LoadLevel(int levelIndex)
@@ -87,8 +98,27 @@ public class LevelManager : MonoBehaviour
         tileCounts = CountTiles(levelData.tiles);
         GetTotalAmmo();
         GenerateLevel(levelData);
+
+        Debug.Log("Level yüklendi: " + lvl);
     }
 
+    //void ClearLevel() // Her level yüklediginde sahne reseti
+    //{
+    //    if (grid != null)
+    //    {
+    //        for (int y = 0; y < grid.GetLength(1); y++)
+    //        {
+    //            for (int x = 0; x < grid.GetLength(0); x++)
+    //            {
+    //                if (grid[x, y] != null)
+    //                    LeanPool.Despawn(grid[x, y].gameObject);
+    //            }
+    //        }
+    //    }
+    //    grid = null;
+
+    //    TurretManager.Instance.ClearTurrets(); // turret'lar için aynı mantık, ayrı method gerekir
+    //}
 
     void GenerateLevel(LevelData levelData)
     {
@@ -208,8 +238,8 @@ public class LevelManager : MonoBehaviour
 
             var neighborLink = neighbor.GetComponent<TurretLink>();
             if (neighborLink == null || neighborLink.HasLink) continue;
-                if (UnityEngine.Random.value <= linkChance)
-                    link.Link(neighbor);
+            if (UnityEngine.Random.value <= linkChance)
+                link.Link(neighbor);
         }
     }
 

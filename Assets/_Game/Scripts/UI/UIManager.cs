@@ -13,9 +13,11 @@ public class UIManager : MonoBehaviour
     [SerializeField] GameObject settingPanel;
     [SerializeField] GameObject coinPanel;
     [SerializeField] GameObject losePanel;
+    [SerializeField] GameObject winPanel;
     [SerializeField] GameObject boosterPlatePanel;
     [SerializeField] GameObject boosterPanel2;
     [SerializeField] GameObject boosterPanel3;
+    [SerializeField] GameObject boosterButton;
 
 
     private void Awake()
@@ -28,6 +30,7 @@ public class UIManager : MonoBehaviour
         GameEvent.OnGameLose += HandleLosePanel;
         GameEvent.OnLevelLose += HandleLosePanel;
         GameEvent.OnGameRestart += ClosePanel;
+        GameEvent.OnLevelCompleted += HandleWinPanel;
 
 
     }
@@ -36,6 +39,12 @@ public class UIManager : MonoBehaviour
         GameEvent.OnGameLose -= HandleLosePanel;
         GameEvent.OnLevelLose -= HandleLosePanel;
         GameEvent.OnGameRestart -= ClosePanel;
+        GameEvent.OnLevelCompleted -= HandleWinPanel;
+    }
+
+    void HandleWinPanel()
+    {
+        ShowPanel(winPanel);
     }
 
     void HandleLosePanel()
@@ -64,7 +73,6 @@ public class UIManager : MonoBehaviour
     public void PanelPunchAnimation(GameObject rectTransform)
     {
         rectTransform.transform.DOKill(true);
-        rectTransform.transform.localScale = Vector3.one;
         rectTransform.transform.DOPunchScale(new Vector3(0.3f, 0.3f, 0.3f), GameTags.Animation.DOTWEEN_ANIM_DURATION, 5, 1f);
     }
 

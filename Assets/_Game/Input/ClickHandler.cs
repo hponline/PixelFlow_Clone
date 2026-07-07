@@ -18,11 +18,23 @@ public class ClickHandler : MonoBehaviour
     void OnFingerTap(LeanFinger finger)
     {
         if (finger.IsOverGui) return; // UI üzerindeyse 3D raycast atma — built-in
-        
         Ray ray = finger.GetRay(mainCamera);
-        if (Physics.Raycast(ray, out RaycastHit hit, float.MaxValue, clickMask))
+
+        bool hitSometing = Physics.Raycast(ray, out RaycastHit hit, float.MaxValue, clickMask);
+
+        if(BoosterSelectionManager.Instance.IsSelecting)
         {
-            hit.collider.GetComponent<IClickable>()?.OnClick();
+            if(hitSometing && hit.collider.TryGetComponent<Turret>(out var turret) && turret.CurrentState == TurretState.InInventory)
+            {
+                turret.OnClick();
+            }
+            else
+            {
+                BoosterSelectionManager.Instance.CancelSelection();
+            }
         }
+
+        if(hitSometing)
+            hit.collider.GetComponent<IClickable>()?.OnClick();
     }
 }

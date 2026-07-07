@@ -11,8 +11,13 @@ public static class GameTags
         public const string UNLIMITED_LIVES_EXPIRY = "UnlimitedLivesExpiry";
         public const string CURRENT_LIFE = "CurrentLife";
         public const string NEXT_LIFE_TIME = "NextLifeTime";
-        public const string SAVED_LEVEL = "SavedLevel";
+        public const string CURRENT_LEVEL = "CurrentLevel";
         public const string PLAYER_COIN = "PlayerCoins";
 
+    }
+
+    public static class Booster
+    {
+        public const string BOOSTER_SAVE_DATA = "BoosterSaveData";
     }
 }

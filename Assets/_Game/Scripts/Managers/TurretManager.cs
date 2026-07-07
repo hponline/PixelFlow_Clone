@@ -13,7 +13,6 @@ public class TurretManager : MonoBehaviour
     [SerializeField] float speed = 5f;
     [SerializeField] Turret[] turretPrefabs;
     [SerializeField] Transform turretContainer;
-    [SerializeField] PlatePoolManager platePool;
 
     GridContext gridContext;
 
@@ -58,18 +57,18 @@ public class TurretManager : MonoBehaviour
 
     public void TurretSendToSpline(Turret turret, Action onComplete = null)
     {
-        if (!platePool.TryGetPlate(out Plate plate))
+        if (!PlatePoolManager.Instance.TryGetPlate(out Plate plate))
         {
             Debug.Log("Boş plate yok");
             return;
         }
         turret.enabled = false;
-        plate.Init(spline, speed, turret, platePool, onComplete);
+        plate.Init(spline, speed, turret, PlatePoolManager.Instance, onComplete);
     }
 
     public bool HasFreePlates(int count)
     {
-        return platePool.AvailableCount >= count;
+        return PlatePoolManager.Instance.AvailableCount >= count;
     }
 
 }

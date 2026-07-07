@@ -1,15 +1,14 @@
 using NaughtyAttributes;
-using System;
 using System.Collections.Generic;
-using TMPro;
 using UnityEngine;
 using DG.Tweening;
 
 public class PlatePoolManager : MonoBehaviour
 {
+    public static PlatePoolManager Instance;
+
     [SerializeField] List<Plate> plateList;
     [SerializeField] Transform plateContainer;
-    [SerializeField] PlateSO plateSO;
     [SerializeField] Plate platePrefab;
 
     [Header("Layout")]
@@ -19,16 +18,19 @@ public class PlatePoolManager : MonoBehaviour
     [SerializeField] Ease slideEase = Ease.OutBack;
 
     [Header("UI")]
-    [SerializeField] TextMeshPro plateCounterTxt;
     [SerializeField] int maxPlate = 5;
     [SerializeField] int currentPlate;
 
+    public int CurrentPlate => currentPlate;
+    public int MaxPlate => maxPlate;
     public int AvailableCount => availablePlates.Count;
 
     private List<Plate> availablePlates = new();
 
     private void Awake()
     {
+        Instance = this;
+
         int count = Mathf.Min(maxPlate, plateList.Count);
         for (int i = 0; i < count; i++)
             availablePlates.Add(plateList[i]);
@@ -37,9 +39,6 @@ public class PlatePoolManager : MonoBehaviour
         RefreshPositions();
     }
 
-    private void OnEnable() => GameEvent.OnPlateCountChanged += HandlePlateCount;
-    private void OnDisable() => GameEvent.OnPlateCountChanged -= HandlePlateCount;
-
     public bool TryGetPlate(out Plate plate)
     {
         if (availablePlates.Count > 0)
@@ -47,7 +46,7 @@ public class PlatePoolManager : MonoBehaviour
             plate = availablePlates[0];
             availablePlates.RemoveAt(0);
             currentPlate--;
-            //RefreshPositions();
+
             GameEvent.TriggerPlateChanged();
             return true;
         }
@@ -57,7 +56,7 @@ public class PlatePoolManager : MonoBehaviour
 
     public void ReturnPlate(Plate plate)
     {
-        availablePlates.Add(plate); // sona eklenir, queue mantýðý
+        availablePlates.Add(plate);
         currentPlate++;
         RefreshPositions();
         GameEvent.TriggerPlateChanged();
@@ -82,34 +81,22 @@ public class PlatePoolManager : MonoBehaviour
         GameEvent.TriggerPlateChanged();
     }
 
-    public void BuyPlate()
+    public void AddPlateSlot()
     {
-        if (!CoinManager.Instance.HasEnoughCoins(plateSO.platePrice)) return;
-
-        CoinManager.Instance.SpendCoins(plateSO.platePrice);
-
         Plate plate = Instantiate(platePrefab, plateContainer);
-        plate.transform.position = GetBuySpawnPoint(); // ekranýn altýndan baþlar
+        plate.transform.position = GetBuySpawnPoint();
 
         plateList.Add(plate);
         availablePlates.Add(plate);
         maxPlate++;
         currentPlate++;
 
-        RefreshPositions(); // bu plate de hedefine uçar
+        RefreshPositions();
         GameEvent.TriggerPlateChanged();
     }
 
     Vector3 GetBuySpawnPoint()
     {
-        // Ekranýn altýndan baþlangýç noktasý — Inspector'dan ayarlanabilir bir Transform daha doðru olur
-        return firstSlotPoint.position + Vector3.down * 5f;
-    }
-
-    void HandlePlateCount() => ShowPlateCount();
-
-    void ShowPlateCount()
-    {
-        plateCounterTxt.SetText("{0}/{1}", currentPlate, maxPlate);
+        return firstSlotPoint.position + Vector3.back * 20f;
     }
 }
