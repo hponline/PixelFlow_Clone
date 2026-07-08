@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dda89d070d97dcb478ffe5e42b41fd85, type: 3}
+  m_Name: bigPack
+  m_EditorClassIdentifier: Assembly-CSharp::ShopDataSO
+  packName: BIG PACK
+  goldIcon: {fileID: 21300000, guid: 6fe3667c175fa44c7bfcd2a01b344746, type: 3}
+  lifeIcon: {fileID: 21300000, guid: a1e1955bc1c0a49c0b46efbef4ad0694, type: 3}
+  lifeReward: 10
+  goldReward: 12000
+  itemPrice: 299.99

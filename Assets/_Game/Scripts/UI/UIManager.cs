@@ -6,6 +6,8 @@ public class UIManager : MonoBehaviour
 {
     public static UIManager Instance;
 
+    [SerializeField] UIIntroController _UIIntroController;
+
     public GameObject[] panels;
 
 
@@ -68,6 +70,8 @@ public class UIManager : MonoBehaviour
         {
             panel.SetActive(false);
         }
+
+        _UIIntroController.ShowPanel(true);
     }
 
     public void PanelPunchAnimation(GameObject rectTransform)

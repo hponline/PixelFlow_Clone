@@ -166,4 +166,41 @@ public class TurretInventory : MonoBehaviour
             UpdateClickable(i);
         }
     }
+
+    void Shuffle(List<GameObject> list)
+    {
+        for (int i = list.Count - 1; i > 0; i--)
+        {
+            int randomIndex = Random.Range(0, i + 1);
+            (list[i], list[randomIndex]) = (list[randomIndex], list[i]);
+        }
+    }
+
+    public void ShuffleButton()
+    {
+        List<GameObject> allObjects = new List<GameObject>();
+
+        foreach (var ray in rays)
+        {
+            allObjects.AddRange(ray);
+        }
+
+        Shuffle(allObjects);
+
+        int index = 0;
+
+        for (int i = 0; i < rays.Count; i++)
+        {
+            int count = rays[i].Count;
+            rays[i].Clear();
+
+            for (int j = 0; j < count; j++)
+            {
+                rays[i].Add(allObjects[index]);
+                index++;
+            }
+
+            RefreshRay(i);
+        }
+    }
 }
