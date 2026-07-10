@@ -12,6 +12,7 @@ public static class GameEvent
 
     public static event Action OnLevelCompleted;
     public static event Action OnLevelLose;
+    public static event Action OnLevelRestart;
 
     public static event Action OnSlotFull;
     public static event Action OnPlateCountChanged;
@@ -21,6 +22,7 @@ public static class GameEvent
     public static void TriggerGameLose() => OnGameLose?.Invoke();
 
     public static void TriggerLevelCompleted() => OnLevelCompleted?.Invoke();
+    public static void TriggerLevelRestart() => OnLevelRestart?.Invoke();
     public static void TriggerLevelLose() => OnLevelLose?.Invoke();
     public static void TriggerSlotFull() => OnSlotFull?.Invoke();
     public static void TriggerPlateChanged() => OnPlateCountChanged?.Invoke();

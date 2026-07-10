@@ -27,7 +27,7 @@ public class GameManager : MonoBehaviour
 
     void Setup()
     {
-        currentLife = DataManager.Instance.currentLife;
+        currentLife = LifeManager.Instance.CurrentLife;
     }
 
     [Button]
@@ -47,6 +47,7 @@ public class GameManager : MonoBehaviour
         if (!HasEnoughLife()) return;
 
         GameEvent.TriggerGameRestart();
+        GameEvent.TriggerLevelRestart();
         SceneManager.LoadScene(0); // tek sahne olursa burasý kalkacak
 
         Debug.Log("Restart Game");
