@@ -44,7 +44,8 @@ public class LevelManager : MonoBehaviour
 
     void Start()
     {
-        LoadLevel(DataManager.Instance.currentLevel);  
+        //LoadLevel(DataManager.Instance.currentLevel);  
+        LoadLevel(currentLevel);  
     }
 
     void CompleteLevel()

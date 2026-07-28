@@ -60,6 +60,7 @@ public class TurretInventory : MonoBehaviour
         }
 
         UpdateClickable(rayIndex);
+        RefreshLinkedPartnerRays(rayIndex);
     }
 
     void UpdateClickable(int rayIndex)
@@ -88,6 +89,29 @@ public class TurretInventory : MonoBehaviour
 
             turret.SetClickable(canClick);
         }
+    }
+
+    void RefreshLinkedPartnerRays(int rayIndex)
+    {
+        var ray = rays[rayIndex];
+        HashSet<int> partnerRays = null;
+
+        for (int i = 0; i < ray.Count; i++)
+        {
+            if (!ray[i].TryGetComponent<Turret>(out var turret)) continue;
+            if (!turret.HasLink) continue;
+
+            var (linkedRay, _) = GetPosition(turret.LinkedTurret.gameObject);
+            if (linkedRay == -1 || linkedRay == rayIndex) continue;
+
+            partnerRays ??= new HashSet<int>();
+            partnerRays.Add(linkedRay);
+        }
+
+        if (partnerRays == null) return;
+
+        foreach (var r in partnerRays)
+            UpdateClickable(r);
     }
 
     public Turret GetNeighbor(GameObject turretObj)
