@@ -6,7 +6,7 @@ public class Block : MonoBehaviour
 {
     public static event Action<Block> OnBlockDestroyed;
 
-    public ColorType blockColor;
+    public TileType blockColor;
     public bool isShot = false;
     public int ring;
 

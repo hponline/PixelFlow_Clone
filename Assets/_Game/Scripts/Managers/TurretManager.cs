@@ -21,7 +21,7 @@ public class TurretManager : MonoBehaviour
         Instance = this;
     }
 
-    public Turret SpawnTurretWithAmmo(ColorType color, int ammo)
+    public Turret SpawnTurretWithAmmo(TileType color, int ammo)
     {
         Turret prefab = GetTurretPrefabByColor(color);
         Turret turret = LeanPool.Spawn(prefab, turretContainer);
@@ -32,7 +32,7 @@ public class TurretManager : MonoBehaviour
         return turret;
     }
 
-    Turret GetTurretPrefabByColor(ColorType color)
+    Turret GetTurretPrefabByColor(TileType color)
     {
         foreach (var prefab in turretPrefabs)
         {

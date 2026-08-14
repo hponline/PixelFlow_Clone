@@ -18,6 +18,14 @@ public class LevelManager : MonoBehaviour
     public Grid gridComponent;
     public int turretMaxAmmo;
 
+    [Header("Play Area (Ortalama ve Ölçekleme)")]
+    [SerializeField] Transform playAreaMin;
+    [SerializeField] Transform playAreaMax;
+    [Tooltip("Block prefablarının tasarlandığı referans hücre boyutu (Grid component'inin şu anki Cell Size'ı, örn. 0.33).")]
+    [SerializeField] float referenceCellSize = 0.33f;
+
+    float currentVisualScale = 1f;
+
     [Header("Turret Links")]
     [Range(0f, 1f)]
     [SerializeField] float linkChance = 0.5f;
@@ -121,11 +129,51 @@ public class LevelManager : MonoBehaviour
     //    TurretManager.Instance.ClearTurrets(); // turret'lar için aynı mantık, ayrı method gerekir
     //}
 
+    /// <summary>
+    /// Play area sınırları içine sığacak şekilde grid'in hücre boyutunu hesaplar,
+    /// origin'i level'in merkezi Play Area'nın merkeziyle çakışacak şekilde ayarlar.
+    /// Block'ların görsel scale'i için kullanılacak oranı currentVisualScale'e yazar.
+    /// </summary>
+
+    void ConfigureGrid(int width, int height)
+    {
+        if (playAreaMin == null || playAreaMax == null)
+        {
+            Debug.LogWarning("PlayAreaMin/PlayAreaMax atanmamış, grid ortalama/ölçekleme atlanıyor.");
+            currentVisualScale = 1f;
+            return;
+        }
+
+        float playAreaWidth = playAreaMax.position.x - playAreaMin.position.x;
+        float playAreaHeight = playAreaMax.position.z - playAreaMin.position.z;
+
+        float cellSize = Mathf.Min(playAreaWidth / width, playAreaHeight / height);
+
+        float totalGridWidth = width * cellSize;
+        float totalGridHeight = height * cellSize;
+
+        float offsetX = (playAreaWidth - totalGridWidth) / 2f;
+        float offsetZ = (playAreaHeight - totalGridHeight) / 2f;
+
+        Vector3 startPos = playAreaMin.position + new Vector3(offsetX, 0f, offsetZ);
+
+        Vector3 cellSizeVector = gridComponent.cellSize;
+        cellSizeVector.x = cellSize;
+        cellSizeVector.z = cellSize;
+        gridComponent.cellSize = cellSizeVector;
+
+        gridComponent.transform.position = startPos;
+
+        currentVisualScale = cellSize / referenceCellSize;
+    }
+
     void GenerateLevel(LevelData levelData)
     {
         if (levelData == null || levelData.tiles == null) return;
         int expected = levelData.width * levelData.height;
         if (levelData.tiles.Length != expected) return;
+
+        ConfigureGrid(levelData.width, levelData.height);
 
         grid = new Block[levelData.width, levelData.height];
         remainingBlocks = 0;
@@ -153,7 +201,7 @@ public class LevelManager : MonoBehaviour
                 Vector3 pos = gridComponent.GetCellCenterWorld(new Vector3Int(x, 0, y));
                 GameObject prefab = database.GetPrefab(type);
                 GameObject spawned = LeanPool.Spawn(prefab, pos, Quaternion.identity, blockContainer);
-
+                spawned.transform.localScale = prefab.transform.localScale * currentVisualScale;
                 if (!spawned.TryGetComponent<Block>(out var _block)) continue;
 
                 _block.ring = Mathf.Min(Mathf.Min(x, y), Mathf.Min(levelData.width - 1 - x, levelData.height - 1 - y));
@@ -163,6 +211,7 @@ public class LevelManager : MonoBehaviour
                 remainingBlocks++;
             }
         }
+
         gridContext = new GridContext
         {
             grid = grid,
@@ -185,7 +234,7 @@ public class LevelManager : MonoBehaviour
 
         foreach (var data in turretDataArray)
         {
-            ColorType color = (ColorType)data.color;
+            TileType color = (TileType)data.color;
             Turret turret = TurretManager.Instance.SpawnTurretWithAmmo(color, data.ammo);
             spawnedMap[data.id] = turret;
         }
@@ -210,9 +259,9 @@ public class LevelManager : MonoBehaviour
 
         foreach (var entry in tileCounts)
         {
-            if (entry.Key == (int)ColorType.None) continue;
+            if (entry.Key == (int)TileType.None) continue;
 
-            ColorType color = (ColorType)entry.Key;
+            TileType color = (TileType)entry.Key;
             int remaining = entry.Value;
             while (remaining > 0)
             {
@@ -262,7 +311,7 @@ public class LevelManager : MonoBehaviour
         turretMaxAmmo = 0;
         foreach (var tile in tileCounts)
         {
-            if (tile.Key == (int)ColorType.None) continue;
+            if (tile.Key == (int)TileType.None) continue;
 
             turretMaxAmmo += tile.Value;
         }

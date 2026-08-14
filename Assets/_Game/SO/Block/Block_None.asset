@@ -13,4 +13,5 @@ MonoBehaviour:
   m_Name: Block_None
   m_EditorClassIdentifier: Assembly-CSharp::TilePrefab
   type: 0
-  prefab: {fileID: 6262631651529982956, guid: 68a3f87811dfbd5429813e621267bb1e, type: 3}
+  prefab: {fileID: 8078163414475874558, guid: 49723b9711f84fb4cb51d64cffcc9a94, type: 3}
+  sampleColor: {r: 1, g: 1, b: 1, a: 1}
