@@ -14,6 +14,8 @@ public class TurretInventory : MonoBehaviour
     [SerializeField] private Transform[] rayStartPoints;
 
     private List<List<GameObject>> rays = new();
+    private List<List<Turret>> turretCache;
+    private List<List<TurretHighlight>> highlightCache;
     private int currentRayIndex = 0;
 
     private void Awake()
@@ -22,6 +24,32 @@ public class TurretInventory : MonoBehaviour
 
         foreach (var _ in rayStartPoints)
             rays.Add(new List<GameObject>());
+
+    }
+    private void Start()
+    {
+        CacheComponents();
+    }
+
+    void CacheComponents()
+    {
+        turretCache = new List<List<Turret>>();
+        highlightCache = new List<List<TurretHighlight>>();
+
+        foreach (var ray in rays)
+        {
+            var turretRow = new List<Turret>();
+            var highlightRow = new List<TurretHighlight>();
+
+            foreach (var turretObj in ray)
+            {
+                turretRow.Add(turretObj.GetComponent<Turret>());
+                highlightRow.Add(turretObj.GetComponentInChildren<TurretHighlight>());
+            }
+
+            turretCache.Add(turretRow);
+            highlightCache.Add(highlightRow);
+        };
     }
 
     public void AddTurret(GameObject turretObj)
@@ -163,12 +191,12 @@ public class TurretInventory : MonoBehaviour
 
     public void SetAllHighlighted(bool active)
     {
-        foreach (var ray in rays)
+        for (int i = 0; i < turretCache.Count; i++)
         {
-            foreach (var turretObj in ray)
+            for (int j = 0; j < turretCache[i].Count; j++)
             {
-                turretObj.GetComponent<Turret>()?.SetClickable(active);
-                turretObj.GetComponentInChildren<TurretHighlight>()?.SetHighlighted(active);
+                turretCache[i][j]?.SetClickable(active);
+                highlightCache[i][j]?.SetHighlighted(active);
             }
         }
 

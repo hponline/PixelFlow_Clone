@@ -10,7 +10,6 @@ public class LevelManager : MonoBehaviour
     public TileDatabase database;
     public Transform blockContainer;
 
-    public LevelData levelData;
     public LevelList levelList;
     [SerializeField] int currentLevel = 0;
 
@@ -26,13 +25,11 @@ public class LevelManager : MonoBehaviour
 
     float currentVisualScale = 1f;
 
-    [Header("Turret Links")]
-    [Range(0f, 1f)]
-    [SerializeField] float linkChance = 0.5f;
-
     GridContext gridContext;
-    Dictionary<int, int> tileCounts;
     int remainingBlocks;
+
+    [Header("Test")]
+    [SerializeField] bool Test = false;
 
     private void Awake()
     {
@@ -52,8 +49,10 @@ public class LevelManager : MonoBehaviour
 
     void Start()
     {
-        //LoadLevel(DataManager.Instance.currentLevel);  
-        LoadLevel(currentLevel);  
+        if (Test)
+            LoadLevel(currentLevel);  
+        else    
+            LoadLevel(DataManager.Instance.currentLevel);  
     }
 
     void CompleteLevel()
@@ -94,7 +93,7 @@ public class LevelManager : MonoBehaviour
         UIManager.Instance.ClosePanel();
 
         DataManager.Instance.SaveGame();
-        Debug.Log("Level değişti Şimdiki level: " + nextLevel);
+        Debug.Log($"Level değişti Şimdiki level: {nextLevel}");
     }
 
     public void LoadLevel(int levelIndex)
@@ -103,31 +102,9 @@ public class LevelManager : MonoBehaviour
         var json = levelList.levels[lvl];
 
         LevelData levelData = JsonUtility.FromJson<LevelData>(json.text);
-
-        tileCounts = CountTiles(levelData.tiles);
-        GetTotalAmmo();
         GenerateLevel(levelData);
-
-        Debug.Log("Level yüklendi: " + lvl);
+        Debug.Log($"Level yüklendi: {lvl} Şimdiki level: {levelList.levels[lvl].name}");
     }
-
-    //void ClearLevel() // Her level yüklediginde sahne reseti
-    //{
-    //    if (grid != null)
-    //    {
-    //        for (int y = 0; y < grid.GetLength(1); y++)
-    //        {
-    //            for (int x = 0; x < grid.GetLength(0); x++)
-    //            {
-    //                if (grid[x, y] != null)
-    //                    LeanPool.Despawn(grid[x, y].gameObject);
-    //            }
-    //        }
-    //    }
-    //    grid = null;
-
-    //    TurretManager.Instance.ClearTurrets(); // turret'lar için aynı mantık, ayrı method gerekir
-    //}
 
     /// <summary>
     /// Play area sınırları içine sığacak şekilde grid'in hücre boyutunu hesaplar,
@@ -223,8 +200,6 @@ public class LevelManager : MonoBehaviour
 
         if (levelData.turrets != null && levelData.turrets.Length > 0)
             SpawnTurretsFromData(levelData.turrets);
-        else
-            DistributeTurrets();
     }
 
     void SpawnTurretsFromData(TurretLinkData[] turretDataArray)
@@ -253,67 +228,21 @@ public class LevelManager : MonoBehaviour
         }
     }
 
-    void DistributeTurrets() // Mermi dağıtım
-    {
-        List<Turret> spawnedTurrets = new List<Turret>();
+    //void ClearLevel() // Her level yüklediginde sahne reseti
+    //{
+    //    if (grid != null)
+    //    {
+    //        for (int y = 0; y < grid.GetLength(1); y++)
+    //        {
+    //            for (int x = 0; x < grid.GetLength(0); x++)
+    //            {
+    //                if (grid[x, y] != null)
+    //                    LeanPool.Despawn(grid[x, y].gameObject);
+    //            }
+    //        }
+    //    }
+    //    grid = null;
 
-        foreach (var entry in tileCounts)
-        {
-            if (entry.Key == (int)TileType.None) continue;
-
-            TileType color = (TileType)entry.Key;
-            int remaining = entry.Value;
-            while (remaining > 0)
-            {
-                int ammo = UnityEngine.Random.Range(1, Mathf.Min(40, remaining) + 1);
-                remaining -= ammo;
-
-                Turret turret = TurretManager.Instance.SpawnTurretWithAmmo(color, ammo);
-                spawnedTurrets.Add(turret);
-            }
-        }
-
-        LinkTurrets(spawnedTurrets);
-    }
-
-    void LinkTurrets(List<Turret> turrets)
-    {
-        foreach (var turret in turrets)
-        {
-            var link = turret.GetComponent<TurretLink>();
-            if (link == null || link.HasLink) continue;
-
-            Turret neighbor = TurretInventory.Instance.GetNeighbor(turret.gameObject);
-            if (neighbor == null) continue;
-
-            var neighborLink = neighbor.GetComponent<TurretLink>();
-            if (neighborLink == null || neighborLink.HasLink) continue;
-            if (UnityEngine.Random.value <= linkChance)
-                link.Link(neighbor);
-        }
-    }
-
-    Dictionary<int, int> CountTiles(int[] tiles)
-    {
-        Dictionary<int, int> counts = new Dictionary<int, int>();
-        foreach (int tile in tiles)
-        {
-            if (!counts.ContainsKey(tile))
-                counts[tile] = 0;
-
-            counts[tile]++;
-        }
-        return counts;
-    }
-
-    void GetTotalAmmo()
-    {
-        turretMaxAmmo = 0;
-        foreach (var tile in tileCounts)
-        {
-            if (tile.Key == (int)TileType.None) continue;
-
-            turretMaxAmmo += tile.Value;
-        }
-    }
+    //    TurretManager.Instance.ClearTurrets(); // turret'lar için aynı mantık, ayrı method gerekir
+    //}
 }

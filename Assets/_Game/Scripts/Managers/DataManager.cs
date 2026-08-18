@@ -18,7 +18,7 @@ public class DataManager : MonoBehaviour
 
     void Setup()
     {
-        currentLevel = PlayerPrefs.GetInt(GameTags.PlayerPrefsKeys.CURRENT_LEVEL, 1);
+        currentLevel = PlayerPrefs.GetInt(GameTags.PlayerPrefsKeys.CURRENT_LEVEL, 0);
         currentCoin = PlayerPrefs.GetInt(GameTags.PlayerPrefsKeys.PLAYER_COIN, 0);
     }
 

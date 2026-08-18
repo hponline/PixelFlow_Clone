@@ -24,6 +24,6 @@ public class UILevelNumber : MonoBehaviour
 
     void SetText(int level)
     {
-        levelTxt.SetText("Level {0}", level);
+        levelTxt.SetText("Level {0}", level + 1);
     }
 }

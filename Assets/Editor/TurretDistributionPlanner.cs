@@ -30,12 +30,15 @@ public static class TurretDistributionPlanner
 
         int nextId = 0;
 
-        var orderedCounts = tileCounts.OrderBy(entry => entry.Key);
+        var orderedCounts = tileCounts
+            .OrderByDescending(entry => entry.Key)
+            .ThenBy(entry => entry.Key);
 
         foreach (var entry in orderedCounts)
         {
             TileType color = entry.Key;
             int remaining = entry.Value;
+
 
             while (remaining > 0)
             {

@@ -1,6 +1,5 @@
 using DG.Tweening;
 using Lean.Pool;
-using TMPro;
 using UnityEngine;
 
 [RequireComponent(typeof(Turret))]
@@ -9,10 +8,7 @@ public class TurretShooter : MonoBehaviour
     [SerializeField] Turret turret;
     GridContext gridContext;
 
-    private void Awake()
-    {
-        turret = GetComponent<Turret>();
-    }
+    private void Awake() => turret = GetComponent<Turret>();
 
     public void Init(GridContext context) => gridContext = context;
 
