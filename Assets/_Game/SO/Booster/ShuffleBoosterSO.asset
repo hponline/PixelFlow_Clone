@@ -14,3 +14,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ShuffleBoosterSO
   boosterType: 3
   price: 200
+  unlockLevel: 3

@@ -7,15 +7,18 @@ public class LevelManager : MonoBehaviour
 {
     public static LevelManager Instance;
 
+    [SerializeField] TransitionScreen transitionScreen;
+
     public TileDatabase database;
     public Transform blockContainer;
 
     public LevelList levelList;
-    [SerializeField] int currentLevel = 0;
+    [SerializeField] int _TestCurrentLevel = 0;
+    [SerializeField] int maxLevel = 0;
+    public int MaxLevel => maxLevel;
 
     [SerializeField] Block[,] grid;
     public Grid gridComponent;
-    public int turretMaxAmmo;
 
     [Header("Play Area (Ortalama ve Ölçekleme)")]
     [SerializeField] Transform playAreaMin;
@@ -50,16 +53,18 @@ public class LevelManager : MonoBehaviour
     void Start()
     {
         if (Test)
-            LoadLevel(currentLevel);  
+            LoadLevel(_TestCurrentLevel);  
         else    
-            LoadLevel(DataManager.Instance.currentLevel);  
+            LoadLevel(DataManager.Instance.currentLevel);
+
+        CheckMaxLevel();
     }
 
     void CompleteLevel()
     {
-        int nextLvl = PlayerPrefs.GetInt(GameTags.PlayerPrefsKeys.CURRENT_LEVEL, 0) +1;
-        DataManager.Instance.SaveLevel(nextLvl);
+        int completedLvl = DataManager.Instance.currentLevel;
 
+        DataManager.Instance.SaveLevel(completedLvl);
         Debug.Log("Level Win");
         GameEvent.TriggerLevelCompleted();
     }
@@ -87,13 +92,14 @@ public class LevelManager : MonoBehaviour
     public void NextLevel()
     {
         int nextLevel = DataManager.Instance.NextLevel;
+        transitionScreen.ToggleTransitionScreen();
+
         LoadLevel(nextLevel);
 
         GameEvent.TriggerLevelChanged(nextLevel);
         UIManager.Instance.ClosePanel();
-
-        DataManager.Instance.SaveGame();
-        Debug.Log($"Level değişti Şimdiki level: {nextLevel}");
+        
+        DataManager.Instance.SaveLevel(nextLevel);
     }
 
     public void LoadLevel(int levelIndex)
@@ -104,6 +110,11 @@ public class LevelManager : MonoBehaviour
         LevelData levelData = JsonUtility.FromJson<LevelData>(json.text);
         GenerateLevel(levelData);
         Debug.Log($"Level yüklendi: {lvl} Şimdiki level: {levelList.levels[lvl].name}");
+    }
+
+    void CheckMaxLevel()
+    {
+        maxLevel = levelList.levels.Length;
     }
 
     /// <summary>

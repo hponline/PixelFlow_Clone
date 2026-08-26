@@ -16,7 +16,7 @@ public class Turret : MonoBehaviour, IClickable
 
     [Header("UI")]
     public int projectileMagazine;
-    [SerializeField] TextMeshProUGUI magazineTxt;
+    [SerializeField] TextMeshPro magazineTxt;
 
     float animDuration = GameTags.Animation.DOTWEEN_ANIM_DURATION;
     Plate currentPlate;

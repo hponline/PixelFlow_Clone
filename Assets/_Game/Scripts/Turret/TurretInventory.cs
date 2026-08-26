@@ -18,6 +18,7 @@ public class TurretInventory : MonoBehaviour
     private List<List<TurretHighlight>> highlightCache;
     private int currentRayIndex = 0;
 
+
     private void Awake()
     {
         Instance = this;
@@ -29,7 +30,24 @@ public class TurretInventory : MonoBehaviour
     private void Start()
     {
         CacheComponents();
+
     }
+
+    public int CheckTotalTurrets()
+    {
+        int total = 0;
+
+        for (int i = 0; i < rays.Count; i++)
+        {
+            for (int j = 0; j < rays[i].Count; j++)
+            {
+                total += 1;
+            }
+        }
+
+        return total;
+    }
+
 
     void CacheComponents()
     {

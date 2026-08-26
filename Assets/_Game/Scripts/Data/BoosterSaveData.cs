@@ -7,6 +7,7 @@ public class BoosterSaveData
     public BoosterType type;
     public int count;
     public bool hasBeenUnlockedOnce; // ilk kazaným flag'i
+    public bool isLevelUnlocked;
 }
 
 [System.Serializable]

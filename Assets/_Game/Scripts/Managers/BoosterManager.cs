@@ -7,8 +7,11 @@ public class BoosterManager : MonoBehaviour
 {
     public static BoosterManager Instance { get; private set; }
 
+    [SerializeField] List<BoosterSO> allBoosters;
+
     public event Action<BoosterType, int> OnBoosterCountChanged;
     public event Action<BoosterType> OnBoosterFirstUnlocked;
+    public event Action<BoosterType> OnBoosterLevelUnlocked;
 
     private Dictionary<BoosterType, BoosterSaveData> boosterData = new Dictionary<BoosterType, BoosterSaveData>();
 
@@ -18,10 +21,26 @@ public class BoosterManager : MonoBehaviour
         Load();
     }
 
+    public bool IsUnlocked(BoosterType type) => GetData(type).isLevelUnlocked;
+
+    public void CheckLevelUnlocks(int currentLevel)
+    {
+        foreach (var so in allBoosters)
+        {
+            var data = GetData(so.boosterType);
+            if (!data.isLevelUnlocked && currentLevel >= so.unlockLevel)
+            {
+                data.isLevelUnlocked = true;
+                OnBoosterLevelUnlocked?.Invoke(so.boosterType);
+            }
+        }
+        Save();
+    }
+
     public BoosterSaveData GetData(BoosterType type)
     {
         if (!boosterData.ContainsKey(type))
-            boosterData[type] = new BoosterSaveData { type = type, count = 0, hasBeenUnlockedOnce = false };
+            boosterData[type] = new BoosterSaveData { type = type, count = 0, hasBeenUnlockedOnce = false, isLevelUnlocked = false };
 
         return boosterData[type];
     }

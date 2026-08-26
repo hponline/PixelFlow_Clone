@@ -1,0 +1,24 @@
+{
+    "width": 2,
+    "height": 2,
+    "tiles": [
+        7,
+        5,
+        5,
+        7
+    ],
+    "turrets": [
+        {
+            "id": 0,
+            "color": 7,
+            "ammo": 2,
+            "linkedTo": -1
+        },
+        {
+            "id": 1,
+            "color": 5,
+            "ammo": 2,
+            "linkedTo": -1
+        }
+    ]
+}

@@ -7,9 +7,11 @@ public class UILevelNumber : MonoBehaviour
 
     private void Start()
     {
-        GameEvent.OnLevelChanged += OnLevelChanged;
-
         SetText(DataManager.Instance.currentLevel);
+    }
+    private void OnEnable()
+    {
+        GameEvent.OnLevelChanged += OnLevelChanged;
     }
 
     private void OnDisable()

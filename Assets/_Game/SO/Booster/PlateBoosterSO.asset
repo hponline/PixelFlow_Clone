@@ -14,3 +14,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PlateBoosterSO
   boosterType: 1
   price: 300
+  unlockLevel: 0

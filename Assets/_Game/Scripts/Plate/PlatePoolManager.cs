@@ -20,12 +20,13 @@ public class PlatePoolManager : MonoBehaviour
     [Header("UI")]
     [SerializeField] int maxPlate = 5;
     [SerializeField] int currentPlate;
-
+ 
     public int CurrentPlate => currentPlate;
     public int MaxPlate => maxPlate;
     public int AvailableCount => availablePlates.Count;
 
     private List<Plate> availablePlates = new();
+
 
     private void Awake()
     {

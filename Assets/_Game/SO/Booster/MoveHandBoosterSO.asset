@@ -14,3 +14,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::MoveHandBoosterSO
   boosterType: 2
   price: 500
+  unlockLevel: 2

@@ -4,9 +4,10 @@ public class DataManager : MonoBehaviour
 {
     public static DataManager Instance;
 
-    public int currentLevel {  get; private set; }
+    public int currentLevel;
     public int currentCoin;
 
+    public int GetLevel => currentLevel;
     public int NextLevel => currentLevel + 1;
 
     private void Awake()

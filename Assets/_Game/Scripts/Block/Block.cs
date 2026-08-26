@@ -18,6 +18,7 @@ public class Block : MonoBehaviour
         transform.DOScale(0, GameTags.Animation.DOTWEEN_BLOCK_DEAD_DURATION).SetEase(Ease.InBack).OnComplete(() =>
         {
             OnBlockDestroyed?.Invoke(this);
+            isShot = false;
             Lean.Pool.LeanPool.Despawn(gameObject);
         });
     }

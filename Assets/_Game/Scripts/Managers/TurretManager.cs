@@ -13,8 +13,12 @@ public class TurretManager : MonoBehaviour
     [SerializeField] float speed = 5f;
     [SerializeField] Turret[] turretPrefabs;
     [SerializeField] Transform turretContainer;
+    [SerializeField] float boostedSpeed = 10f;
+    [SerializeField] int lowTurretThreshold = 5;
 
     GridContext gridContext;
+
+    //public event Action<int> OnTurretCountChanged;
 
     void Awake()
     {
@@ -28,6 +32,9 @@ public class TurretManager : MonoBehaviour
         turret.Init(gridContext, ammo);
         turret.enabled = false;
         TurretInventory.Instance.AddTurret(turret.gameObject);
+
+        int total = TurretInventory.Instance.CheckTotalTurrets();
+        //OnTurretCountChanged?.Invoke(total);
 
         return turret;
     }
@@ -63,7 +70,15 @@ public class TurretManager : MonoBehaviour
             return;
         }
         turret.enabled = false;
-        plate.Init(spline, speed, turret, PlatePoolManager.Instance, onComplete);
+
+        int totalA = TurretInventory.Instance.CheckTotalTurrets();
+        if (totalA <= lowTurretThreshold)
+        {
+            plate.Init(spline, boostedSpeed, turret, PlatePoolManager.Instance, onComplete);
+            return;
+        }
+        else
+            plate.Init(spline, speed, turret, PlatePoolManager.Instance, onComplete);
     }
 
     public bool HasFreePlates(int count)

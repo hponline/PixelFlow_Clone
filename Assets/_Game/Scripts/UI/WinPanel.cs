@@ -14,11 +14,12 @@ public class WinPanel : MonoBehaviour
 
     void HandleLevelChanged()
     {
-        levelTxt.SetText("Level {0}", DataManager.Instance.currentLevel);
+        levelTxt.SetText("Level {0}", DataManager.Instance.currentLevel + 1);
     }
 
     public void NextLevelButton()
     {
+        BoosterManager.Instance.CheckLevelUnlocks(DataManager.Instance.NextLevel);
         LevelManager.Instance.NextLevel();
     }
 

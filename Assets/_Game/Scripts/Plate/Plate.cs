@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class Plate : MonoBehaviour
 {
-    [SerializeField] private SplineFollower follower;
+    [SerializeField] public SplineFollower follower;
     [SerializeField] private Transform mountPoint;
     [SerializeField] private Transform visual;
 
