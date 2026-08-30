@@ -32,6 +32,7 @@ public class BoosterManager : MonoBehaviour
             {
                 data.isLevelUnlocked = true;
                 OnBoosterLevelUnlocked?.Invoke(so.boosterType);
+                Debug.LogWarning("Booster Unlock: " + so.boosterType.ToString());
             }
         }
         Save();

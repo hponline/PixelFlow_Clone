@@ -17,11 +17,13 @@ public class UIBoosterButton : MonoBehaviour
     [SerializeField] private Image boosterActive;
     [SerializeField] private Image boosterPassive;
     [SerializeField] private GameObject panelPunchAnim;
-    [SerializeField] Button button;
+    [SerializeField] Button activeButton;
+    [SerializeField] Button passiveButton;
 
     private void Start()
     {
-        button.onClick.AddListener(ButtonPunchAnim);     
+        activeButton.onClick.AddListener(ButtonPunchAnim);
+        passiveButton.onClick.AddListener(ButtonPunchAnim);
     }
 
     private void OnEnable()
@@ -38,6 +40,7 @@ public class UIBoosterButton : MonoBehaviour
     {
         BoosterManager.Instance.OnBoosterCountChanged -= HandleCountChanged;
         BoosterManager.Instance.OnBoosterFirstUnlocked -= HandleFirstUnlock;
+        BoosterManager.Instance.OnBoosterLevelUnlocked -= HandleFirstUnlock;
     }
 
     IEnumerator SubscribeWhenReady()
@@ -50,6 +53,7 @@ public class UIBoosterButton : MonoBehaviour
     {
         BoosterManager.Instance.OnBoosterCountChanged += HandleCountChanged;
         BoosterManager.Instance.OnBoosterFirstUnlocked += HandleFirstUnlock;
+        BoosterManager.Instance.OnBoosterLevelUnlocked += HandleFirstUnlock;
         RefreshVisual(BoosterManager.Instance.GetData(boosterType).count);
     }
 
@@ -63,6 +67,7 @@ public class UIBoosterButton : MonoBehaviour
     {
         if (type != boosterType) return;
         particle?.SetActive(true);
+        RefreshVisual(0);
     }
 
     private void RefreshVisual(int count)
@@ -70,11 +75,8 @@ public class UIBoosterButton : MonoBehaviour
         bool isUnlocked = BoosterManager.Instance.IsUnlocked(boosterType);
         bool hasBooster = count > 0;
 
-        Debug.LogWarning("unlock1: " + isUnlocked);
         lockedOverlay?.SetActive(!isUnlocked);
-        Debug.LogWarning("unlock2: " + isUnlocked);
         lockTxtLvlInfo.SetText("Lv {0}", boosterSO.unlockLevel);
-        Debug.LogWarning("unlock3: " + isUnlocked);
         boosterActive?.gameObject.SetActive(isUnlocked && hasBooster);
         boosterPassive?.gameObject.SetActive(isUnlocked && !hasBooster);
         boosterCount?.gameObject.SetActive(isUnlocked && hasBooster);
@@ -99,7 +101,7 @@ public class UIBoosterButton : MonoBehaviour
         int count = BoosterManager.Instance.GetData(boosterType).count;
         if (count <= 0)
         {
-            ShowPanel();
+            ShowBuyPanel();
             return;
         }
 
@@ -113,10 +115,11 @@ public class UIBoosterButton : MonoBehaviour
             Debug.Log("UseBooster: " + boosterType);
             if (!BoosterManager.Instance.TryUseBooster(boosterType)) return;
             boosterSO.Activate(new BoosterContext());
+            // plate ve shuffle için
         }
     }
 
-    void ShowPanel()
+    void ShowBuyPanel()
     {
         UIManager.Instance.ShowPanel(boosterBuyPanel);
     }

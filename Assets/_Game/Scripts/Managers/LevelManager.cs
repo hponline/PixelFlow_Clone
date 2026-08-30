@@ -43,11 +43,15 @@ public class LevelManager : MonoBehaviour
     {
         Block.OnBlockDestroyed += HandleBlockDestroyed;
         GameEvent.OnSlotFull += HandleSlotsFull;
+
+        GameEvent.OnLevelCompleted += OnCheckLevel;
     }
     private void OnDisable()
     {
         Block.OnBlockDestroyed -= HandleBlockDestroyed;
         GameEvent.OnSlotFull -= HandleSlotsFull;
+
+        GameEvent.OnLevelCompleted -= OnCheckLevel;
     }
 
     void Start()
@@ -58,6 +62,11 @@ public class LevelManager : MonoBehaviour
             LoadLevel(DataManager.Instance.currentLevel);
 
         CheckMaxLevel();
+    }
+
+    void OnCheckLevel()
+    {
+        BoosterManager.Instance.CheckLevelUnlocks(DataManager.Instance.currentLevel +1);
     }
 
     void CompleteLevel()

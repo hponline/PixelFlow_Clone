@@ -19,7 +19,8 @@ public class WinPanel : MonoBehaviour
 
     public void NextLevelButton()
     {
-        BoosterManager.Instance.CheckLevelUnlocks(DataManager.Instance.NextLevel);
+        //BoosterManager.Instance.CheckLevelUnlocks(DataManager.Instance.NextLevel);
+        Debug.LogWarning("Sonraki lvl: " + DataManager.Instance.NextLevel);
         LevelManager.Instance.NextLevel();
     }
 
