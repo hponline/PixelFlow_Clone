@@ -29,8 +29,12 @@ public class TurretInventory : MonoBehaviour
     }
     private void Start()
     {
+        GameEvent.OnLevelChanged += OnHandleCacheComponents;
         CacheComponents();
-
+    }
+    private void OnDisable()
+    {
+        GameEvent.OnLevelChanged -= OnHandleCacheComponents;
     }
 
     public int CheckTotalTurrets()
@@ -48,6 +52,10 @@ public class TurretInventory : MonoBehaviour
         return total;
     }
 
+    void OnHandleCacheComponents(int value)
+    {
+        CacheComponents();
+    }
 
     void CacheComponents()
     {
@@ -101,7 +109,7 @@ public class TurretInventory : MonoBehaviour
             Vector3 targetPos = startPoint.position + spacingOffset * i;
 
             t.DOKill();
-            t.DOMove(targetPos, slideDuration).SetEase(slideEaseType);
+            t.DOJump(targetPos, 0.5f, 1, slideDuration).SetEase(slideEaseType);
             t.DORotateQuaternion(startPoint.rotation, slideDuration);
         }
 
@@ -117,10 +125,15 @@ public class TurretInventory : MonoBehaviour
             if (!ray[i].TryGetComponent<Turret>(out var turret)) continue;
 
             bool isFirst = i == 0;
+
+            if (isFirst)
+                turret.GetComponent<TurretMaterial>().TurretUnlock();
+
             if (!turret.HasLink)
             {
                 turret.SetClickable(isFirst);
                 continue;
+                // listelerin ilk (0) indexi týklanabilir olur.
             }
 
             var (linkedRay, linkedIndex) = GetPosition(turret.LinkedTurret.gameObject);
@@ -132,7 +145,6 @@ public class TurretInventory : MonoBehaviour
                 isFirst &&
                 linkValid &&
                 (linkedIsFirst || linkedBehind);
-
             turret.SetClickable(canClick);
         }
     }
@@ -157,7 +169,9 @@ public class TurretInventory : MonoBehaviour
         if (partnerRays == null) return;
 
         foreach (var r in partnerRays)
+        {
             UpdateClickable(r);
+        }
     }
 
     public Turret GetNeighbor(GameObject turretObj)

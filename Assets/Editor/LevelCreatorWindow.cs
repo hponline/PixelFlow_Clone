@@ -247,6 +247,14 @@ public class LevelCreatorWindow : EditorWindow
 
             EditorGUILayout.LabelField($"#{draft.Id}  {draft.Color}  ammo:{draft.Ammo}", GUILayout.Width(180));
 
+            string lockLabel = draft.State == TurretUnlockState.Locked ? "Locked" : "Unlocked";
+            GUI.backgroundColor = draft.State == TurretUnlockState.Locked ? Color.red : Color.white;
+            if (GUILayout.Button(lockLabel, GUILayout.Width(70)))
+                draft.State = draft.State == TurretUnlockState.Locked
+                    ? TurretUnlockState.Unlocked
+                    : TurretUnlockState.Locked;
+            GUI.backgroundColor = Color.white;
+
             if (draft.LinkedTo != -1)
             {
                 EditorGUILayout.LabelField($"↔ #{draft.LinkedTo}", GUILayout.Width(60));

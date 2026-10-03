@@ -6,6 +6,7 @@ public class TurretLinkData
     public int color;       // ColorType enum cast
     public int ammo;
     public int linkedTo;    // -1 = no link
+    public TurretUnlockState state;
 }
 [System.Serializable]
 public class LevelData

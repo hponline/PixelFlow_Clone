@@ -19,13 +19,12 @@ public class WinPanel : MonoBehaviour
 
     public void NextLevelButton()
     {
-        //BoosterManager.Instance.CheckLevelUnlocks(DataManager.Instance.NextLevel);
-        Debug.LogWarning("Sonraki lvl: " + DataManager.Instance.NextLevel);
         LevelManager.Instance.NextLevel();
     }
 
     public void DoubleRewardButton()
     {
+        NextLevelButton();
         // x2 reklam reward button
     }
 }

@@ -5,6 +5,9 @@ public abstract class BoosterSO : ScriptableObject
     public BoosterType boosterType;
     public int price = 300;
     public int unlockLevel = 1;
+    public Sprite BoosterIcon;
+    public string BoosterAddDescription;
+    public string BoosterDescription;
 
     public virtual bool RequiresSelection => false;
     public abstract void Activate(BoosterContext context);

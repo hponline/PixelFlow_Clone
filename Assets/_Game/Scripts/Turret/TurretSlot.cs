@@ -7,6 +7,9 @@ public class TurretSlot : MonoBehaviour, IClickable
     [SerializeField] Collider _collider;
     public bool isFull = false;
 
+    [SerializeField] float slotJumpPower = 5f;
+    [SerializeField] float splineJumpPower = 10f;
+
     float animDuration = GameTags.Animation.DOTWEEN_ANIM_DURATION;
     Turret currentTurret;
 
@@ -23,23 +26,49 @@ public class TurretSlot : MonoBehaviour, IClickable
         turret.transform.SetParent(transform);
         currentTurret = turret;
 
+        if (isCompacting)
+            PlayCompactingAnimation(turret);
+        else
+            PlayPlacementAnimation(turret);
+    }
+
+    void PlayCompactingAnimation(Turret turret)
+    {
         Sequence seq = DOTween.Sequence();
 
-        if (isCompacting)
-        {
-            seq.Append(turret.transform.DOLocalMove(Vector3.zero, animDuration).SetEase(Ease.OutCubic));
-            seq.Join(turret.transform.DOPunchScale(turret.transform.localScale * animDuration, animDuration * 0.5f, vibrato: 1, elasticity: 0.5f));
-        }
-        else
-        {
-            seq.Append(turret.transform.DOLocalMove(Vector3.zero, animDuration));
-            seq.Join(turret.transform.DOLocalRotate(new Vector3(0, 360, 0), animDuration));
-        }
+        seq.Append(
+            turret.transform
+                .DOLocalJump(Vector3.zero, slotJumpPower, 1, animDuration)
+                .SetEase(Ease.OutCubic));
 
-        seq.OnComplete(() =>
-        {
-            _collider.enabled = true;
-        });
+        seq.Join(
+            turret.transform.DOPunchScale(
+                turret.transform.localScale * animDuration,
+                animDuration * 0.5f,
+                vibrato: 1,
+                elasticity: 0.5f));
+
+        seq.OnComplete(() => _collider.enabled = true);
+    }
+
+    void PlayPlacementAnimation(Turret turret)
+    {
+        Sequence seq = DOTween.Sequence();
+
+        seq.Append(
+            turret.transform
+                .DOLocalJump(Vector3.zero, splineJumpPower, 1, animDuration)
+                .SetEase(Ease.OutCubic)
+        );
+
+        seq.Join(
+            turret.transform.DOLocalRotate(
+                new Vector3(0, 360, 0),
+                animDuration
+            )
+        );
+
+        seq.OnComplete(() => _collider.enabled = true);
     }
 
     public void ClearState()
@@ -64,6 +93,11 @@ public class TurretSlot : MonoBehaviour, IClickable
     public void OnClick()
     {
         if (!isFull) return;
+        if (PlatePoolManager.Instance.CurrentPlate == 0)
+        {
+            GameEvent.TriggerPlateCountEmpty();
+            return;
+        }
 
         Turret turret = currentTurret;
 

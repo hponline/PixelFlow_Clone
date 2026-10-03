@@ -39,8 +39,8 @@ public class UIBoosterButton : MonoBehaviour
     private void OnDisable()
     {
         BoosterManager.Instance.OnBoosterCountChanged -= HandleCountChanged;
-        BoosterManager.Instance.OnBoosterFirstUnlocked -= HandleFirstUnlock;
-        BoosterManager.Instance.OnBoosterLevelUnlocked -= HandleFirstUnlock;
+        BoosterManager.Instance.OnBoosterFirstUnlocked -= HandleUnlockEvent;
+        BoosterManager.Instance.OnBoosterLevelUnlocked -= HandleUnlockEvent;
     }
 
     IEnumerator SubscribeWhenReady()
@@ -52,28 +52,30 @@ public class UIBoosterButton : MonoBehaviour
     private void Subscribe()
     {
         BoosterManager.Instance.OnBoosterCountChanged += HandleCountChanged;
-        BoosterManager.Instance.OnBoosterFirstUnlocked += HandleFirstUnlock;
-        BoosterManager.Instance.OnBoosterLevelUnlocked += HandleFirstUnlock;
-        RefreshVisual(BoosterManager.Instance.GetData(boosterType).count);
+        BoosterManager.Instance.OnBoosterFirstUnlocked += HandleUnlockEvent;
+        BoosterManager.Instance.OnBoosterLevelUnlocked += HandleUnlockEvent;
+        RefreshVisual();
     }
 
     private void HandleCountChanged(BoosterType type, int count)
     {
         if (type != boosterType) return;
-        RefreshVisual(count);
+        particle?.SetActive(false);
+        RefreshVisual();
     }
 
-    private void HandleFirstUnlock(BoosterType type)
+    private void HandleUnlockEvent(BoosterType type)
     {
         if (type != boosterType) return;
         particle?.SetActive(true);
-        RefreshVisual(0);
+        RefreshVisual();
     }
 
-    private void RefreshVisual(int count)
+    private void RefreshVisual()
     {
+        var data = BoosterManager.Instance.GetData(boosterType);
         bool isUnlocked = BoosterManager.Instance.IsUnlocked(boosterType);
-        bool hasBooster = count > 0;
+        bool hasBooster = data.count> 0;
 
         lockedOverlay?.SetActive(!isUnlocked);
         lockTxtLvlInfo.SetText("Lv {0}", boosterSO.unlockLevel);
@@ -82,7 +84,7 @@ public class UIBoosterButton : MonoBehaviour
         boosterCount?.gameObject.SetActive(isUnlocked && hasBooster);
 
         if (isUnlocked && hasBooster)
-            boosterCount.SetText("{0}", count);
+            boosterCount.SetText("{0}", data.count);
     }
 
     void ButtonPunchAnim()
@@ -105,7 +107,7 @@ public class UIBoosterButton : MonoBehaviour
             return;
         }
 
-        if(boosterSO.RequiresSelection)
+        if (boosterSO.RequiresSelection)
         {
             BoosterSelectionManager.Instance.BeginSelection(boosterSO, boosterType);
         }

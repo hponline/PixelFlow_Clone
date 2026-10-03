@@ -17,6 +17,8 @@ public class Plate : MonoBehaviour
     Vector3 startPos = Vector3.zero;
     Quaternion startRot = Quaternion.identity;
 
+    public Vector3 offset;
+
     private void Awake()
     {
         startPos = transform.position;
@@ -47,12 +49,18 @@ public class Plate : MonoBehaviour
 
     private void StartFollowing(SplineComputer spline, float speed)
     {
-        visual.localRotation = Quaternion.Euler(0, 90, 90);
+        visual.localRotation = Quaternion.Euler(-90, 90, 0);
         follower.spline = spline;
         follower.SetPercent(0);
         follower.followSpeed = speed;
         follower.onEndReached += OnEnd;
         follower.enabled = true;
+    }
+
+    private void OnValidate()
+    {
+        visual.localRotation = Quaternion.Euler(offset);
+        
     }
 
     private void OnEnd(double percent)

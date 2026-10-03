@@ -70,8 +70,10 @@ public static class LevelJsonExporter
                     id = draft.Id,
                     color = (int)draft.Color, // TileType ve ColorType deðerleri birebir eþleþiyor
                     ammo = draft.Ammo,
-                    linkedTo = draft.LinkedTo
+                    linkedTo = draft.LinkedTo,
+                    state = draft.State      
                 };
+                Debug.LogWarning("color: " +turretData[i].color);
             }
         }
 

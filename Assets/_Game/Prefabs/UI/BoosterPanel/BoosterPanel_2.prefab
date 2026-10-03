@@ -1100,7 +1100,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &6012925622859425909
 RectTransform:
   m_ObjectHideFlags: 0
@@ -1145,7 +1145,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::UIBoosterPlate
   boosterType: 2
   amountTxt: {fileID: 3672666055873709467}
+  boosterDesp: {fileID: 1939073445126087685}
+  boosterAddDesp: {fileID: 4706249045673833965}
   boosterSO: {fileID: 11400000, guid: f9b96e2d91d4a8240819a921d5a6aef3, type: 2}
+  boosterImage: {fileID: 8205882587364049784}
 --- !u!1 &6127148321700874032
 GameObject:
   m_ObjectHideFlags: 0
@@ -1598,7 +1601,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: -140}
+  m_AnchoredPosition: {x: 0, y: -176}
   m_SizeDelta: {x: 200, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &1000785133829116906

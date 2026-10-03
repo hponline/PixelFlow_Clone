@@ -50,7 +50,7 @@ public static class TurretDistributionPlanner
                 if (ammo <= 0)
                     ammo = remaining;
 
-                result.Add(new TurretDraft(nextId, color, ammo));
+                result.Add(new TurretDraft(nextId, color, ammo, TurretUnlockState.Unlocked));
                 nextId++;
                 remaining -= ammo;
             }

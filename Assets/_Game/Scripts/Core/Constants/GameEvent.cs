@@ -16,6 +16,7 @@ public static class GameEvent
 
     public static event Action OnSlotFull;
     public static event Action OnPlateCountChanged;
+    public static event Action OnPlateCountEmpty;
 
 
     public static void TriggerGameRestart() => OnGameRestart?.Invoke();
@@ -26,6 +27,7 @@ public static class GameEvent
     public static void TriggerLevelLose() => OnLevelLose?.Invoke();
     public static void TriggerSlotFull() => OnSlotFull?.Invoke();
     public static void TriggerPlateChanged() => OnPlateCountChanged?.Invoke();
+    public static void TriggerPlateCountEmpty() => OnPlateCountEmpty?.Invoke();
 
     public static void TriggerLevelChanged(int level) => OnLevelChanged?.Invoke(level);
     public static void TriggerLivesChanged(int lives) => OnLivesChanged?.Invoke(lives);
@@ -33,6 +35,4 @@ public static class GameEvent
     public static void TriggerCoinSpendChanged() => OnCoinsSpend?.Invoke();
 
     public static void TriggerTurretFired() => OnTurretFired?.Invoke();
-
-
 }

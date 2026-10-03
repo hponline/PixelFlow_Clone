@@ -12,6 +12,7 @@ public class PlatePoolManager : MonoBehaviour
     [SerializeField] Plate platePrefab;
 
     [Header("Layout")]
+    [SerializeField] int baseMaxPlate = 5;
     [SerializeField] Transform firstSlotPoint;
     [SerializeField] Vector3 spacingOffset = new Vector3(0, 0, -2.5f);
     [SerializeField] float slideDuration = GameTags.Animation.DOTWEEN_ANIM_DURATION;
@@ -27,17 +28,27 @@ public class PlatePoolManager : MonoBehaviour
 
     private List<Plate> availablePlates = new();
 
+    private void OnValidate()
+    {
+        RefreshPositions();
+    }
 
     private void Awake()
     {
         Instance = this;
 
-        int count = Mathf.Min(maxPlate, plateList.Count);
+        int count = Mathf.Min(baseMaxPlate, plateList.Count);
         for (int i = 0; i < count; i++)
             availablePlates.Add(plateList[i]);
 
         currentPlate = count;
         RefreshPositions();
+
+        GameEvent.OnLevelChanged += OnHandleResetPlate;
+    }
+    private void OnDisable()
+    {
+        GameEvent.OnLevelChanged -= OnHandleResetPlate;
     }
 
     public bool TryGetPlate(out Plate plate)
@@ -78,15 +89,14 @@ public class PlatePoolManager : MonoBehaviour
     [Button]
     public void AddPlate()
     {
-        currentPlate = Mathf.Min(currentPlate + 1, maxPlate);
-        GameEvent.TriggerPlateChanged();
+        AddPlateSlot();
     }
 
     public void AddPlateSlot()
     {
         Plate plate = Instantiate(platePrefab, plateContainer);
         plate.transform.position = GetBuySpawnPoint();
-
+        plate.transform.rotation = Quaternion.Euler(0,90,0);
         plateList.Add(plate);
         availablePlates.Add(plate);
         maxPlate++;
@@ -99,5 +109,31 @@ public class PlatePoolManager : MonoBehaviour
     Vector3 GetBuySpawnPoint()
     {
         return firstSlotPoint.position + Vector3.back * 20f;
+    }
+
+    [Button]
+    void ResetPlate()
+    {
+        while (plateList.Count > baseMaxPlate)
+        {
+            Plate extra = plateList[^1];
+            plateList.RemoveAt(plateList.Count -1);
+            availablePlates.Remove(extra);
+            Destroy(extra.gameObject);
+        }
+
+        maxPlate = baseMaxPlate;
+        availablePlates.Clear();
+        for (int i = 0; i < baseMaxPlate; i++)
+            availablePlates.Add(plateList[i]);
+
+        currentPlate = baseMaxPlate;
+        RefreshPositions();
+        GameEvent.TriggerPlateChanged();
+    }
+
+    void OnHandleResetPlate(int value)
+    {
+        ResetPlate();
     }
 }

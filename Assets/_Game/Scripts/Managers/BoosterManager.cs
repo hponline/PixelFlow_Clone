@@ -31,6 +31,8 @@ public class BoosterManager : MonoBehaviour
             if (!data.isLevelUnlocked && currentLevel >= so.unlockLevel)
             {
                 data.isLevelUnlocked = true;
+                if(data.count <= 0)
+                    data.count = 3;
                 OnBoosterLevelUnlocked?.Invoke(so.boosterType);
                 Debug.LogWarning("Booster Unlock: " + so.boosterType.ToString());
             }
@@ -41,7 +43,7 @@ public class BoosterManager : MonoBehaviour
     public BoosterSaveData GetData(BoosterType type)
     {
         if (!boosterData.ContainsKey(type))
-            boosterData[type] = new BoosterSaveData { type = type, count = 0, hasBeenUnlockedOnce = false, isLevelUnlocked = false };
+            boosterData[type] = new BoosterSaveData { type = type, count = 3, hasBeenUnlockedOnce = false, isLevelUnlocked = false };
 
         return boosterData[type];
     }
@@ -49,8 +51,7 @@ public class BoosterManager : MonoBehaviour
     public void AddBooster(BoosterType type, int amount)
     {
         var data = GetData(type);
-        bool isFirstUnlock = !data.hasBeenUnlockedOnce && data.count == 0 && amount > 0; // sadece ilk açýldýgýnda parlama efekti olacak
-
+        bool isFirstUnlock = !data.hasBeenUnlockedOnce; // sadece ilk açýldýgýnda parlama efekti olacak
         data.count += amount;
         if (isFirstUnlock)
             data.hasBeenUnlockedOnce = true;

@@ -16,5 +16,4 @@ MonoBehaviour:
   blockLayerMask:
     serializedVersion: 2
     m_Bits: 8
-  magazine: 20
-  projectileSpeed: 0.3
+  projectileSpeed: 0.175

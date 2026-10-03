@@ -230,7 +230,7 @@ public class LevelManager : MonoBehaviour
         foreach (var data in turretDataArray)
         {
             TileType color = (TileType)data.color;
-            Turret turret = TurretManager.Instance.SpawnTurretWithAmmo(color, data.ammo);
+            Turret turret = TurretManager.Instance.SpawnTurretWithAmmo(color, data.ammo, data.state);
             spawnedMap[data.id] = turret;
         }
 

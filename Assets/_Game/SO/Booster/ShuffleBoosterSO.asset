@@ -15,3 +15,6 @@ MonoBehaviour:
   boosterType: 3
   price: 200
   unlockLevel: 3
+  BoosterIcon: {fileID: 21300000, guid: 6fe90d98baba9e042b1b5459592b5186, type: 3}
+  BoosterAddDescription: Add Shuffle
+  BoosterDescription: Add extra shuffle

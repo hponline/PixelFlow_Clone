@@ -13,9 +13,11 @@ public class Block : MonoBehaviour
     public int gridX;
     public int gridZ;
 
+    [SerializeField, Range(0, 1)] float punchForce = 0.2f;
+
     public void DestroyBlock()
     {
-        transform.DOScale(0, GameTags.Animation.DOTWEEN_BLOCK_DEAD_DURATION).SetEase(Ease.InBack).OnComplete(() =>
+        transform.DOPunchScale(Vector3.one * punchForce, GameTags.Animation.DOTWEEN_BLOCK_DEAD_DURATION).SetEase(Ease.InBack).OnComplete(() =>
         {
             OnBlockDestroyed?.Invoke(this);
             isShot = false;

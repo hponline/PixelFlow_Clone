@@ -5,9 +5,8 @@ public class TurretLinkVisual : MonoBehaviour
 {
     private LineRenderer lr;
     private TurretLink link;
-    private bool isDirty; // ilerde pozisyon güncellemesi için -- opsiyonel
 
-    [SerializeField] Vector3 offset = Vector3.one;
+    [SerializeField] Vector3 offset = new Vector3(0, 0.2f, 0);
 
     private void Awake()
     {
@@ -23,7 +22,6 @@ public class TurretLinkVisual : MonoBehaviour
     private void HandleLinkChanged(bool hasLink)
     {
         lr.enabled = hasLink;
-        isDirty = hasLink;
     }
 
     private void LateUpdate()

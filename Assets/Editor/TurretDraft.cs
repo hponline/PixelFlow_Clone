@@ -9,11 +9,13 @@ public class TurretDraft
     public TileType Color;
     public int Ammo;
     public int LinkedTo = -1;
+    public TurretUnlockState State = TurretUnlockState.Unlocked;
 
-    public TurretDraft(int id, TileType color, int ammo)
+    public TurretDraft(int id, TileType color, int ammo, TurretUnlockState state)
     {
         Id = id;
         Color = color;
         Ammo = ammo;
+        State = state;
     }
 }

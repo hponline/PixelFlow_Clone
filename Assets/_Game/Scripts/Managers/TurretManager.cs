@@ -2,6 +2,8 @@ using UnityEngine;
 using Dreamteck.Splines;
 using Lean.Pool;
 using System;
+using System.Collections.Generic;
+using NaughtyAttributes;
 
 public class TurretManager : MonoBehaviour
 {
@@ -18,25 +20,57 @@ public class TurretManager : MonoBehaviour
 
     GridContext gridContext;
 
-    //public event Action<int> OnTurretCountChanged;
+    List<Turret> turretLocks = new();
 
     void Awake()
     {
         Instance = this;
+
+        GameEvent.OnLevelChanged += OnHandleTurretLocks;
+        GameEvent.OnLevelCompleted += ClearTurretList;
+    }
+    private void OnDisable()
+    {
+        GameEvent.OnLevelChanged -= OnHandleTurretLocks;
+        GameEvent.OnLevelCompleted -= ClearTurretList;
     }
 
-    public Turret SpawnTurretWithAmmo(TileType color, int ammo)
+    private void Start()
+    {
+        TurretLocks();
+    }
+
+    public Turret SpawnTurretWithAmmo(TileType color, int ammo, TurretUnlockState state)
     {
         Turret prefab = GetTurretPrefabByColor(color);
         Turret turret = LeanPool.Spawn(prefab, turretContainer);
-        turret.Init(gridContext, ammo);
+
+        turret.Init(gridContext, ammo, state);
+        if (state == TurretUnlockState.Locked)
+            turretLocks.Add(turret);
+
         turret.enabled = false;
         TurretInventory.Instance.AddTurret(turret.gameObject);
 
-        int total = TurretInventory.Instance.CheckTotalTurrets();
-        //OnTurretCountChanged?.Invoke(total);
-
         return turret;
+    }
+
+    void OnHandleTurretLocks(int value)
+    {
+        TurretLocks();
+    }
+
+    void TurretLocks()
+    {
+        foreach (var turret in turretLocks)
+        {
+            turret.GetComponent<TurretMaterial>().TurretLock();
+        }
+    }
+
+    void ClearTurretList()
+    {
+        turretLocks.Clear();
     }
 
     Turret GetTurretPrefabByColor(TileType color)
@@ -64,21 +98,22 @@ public class TurretManager : MonoBehaviour
 
     public void TurretSendToSpline(Turret turret, Action onComplete = null)
     {
-        if (!PlatePoolManager.Instance.TryGetPlate(out Plate plate))
+        var plateManager = PlatePoolManager.Instance;
+        if (!plateManager.TryGetPlate(out Plate plate))
         {
             Debug.Log("Boþ plate yok");
             return;
         }
         turret.enabled = false;
 
-        int totalA = TurretInventory.Instance.CheckTotalTurrets();
-        if (totalA <= lowTurretThreshold)
+        int totalTurrets = TurretInventory.Instance.CheckTotalTurrets();
+        if (totalTurrets <= lowTurretThreshold)
         {
-            plate.Init(spline, boostedSpeed, turret, PlatePoolManager.Instance, onComplete);
+            plate.Init(spline, boostedSpeed, turret, plateManager, onComplete);
             return;
         }
         else
-            plate.Init(spline, speed, turret, PlatePoolManager.Instance, onComplete);
+            plate.Init(spline, speed, turret, plateManager, onComplete);
     }
 
     public bool HasFreePlates(int count)
