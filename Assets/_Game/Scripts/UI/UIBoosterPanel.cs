@@ -14,11 +14,11 @@ public class UIBoosterPanel : MonoBehaviour
 
     private void OnEnable()
     {
-        SetIcon();
+        Setup();
         amountTxt.SetText("{0}", boosterSO.price);
     }
 
-    void SetIcon()
+    void Setup()
     {
         boosterImage.sprite = boosterSO.BoosterIcon;
         boosterDesp.SetText(boosterSO.BoosterDescription);

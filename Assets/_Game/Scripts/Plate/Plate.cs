@@ -14,25 +14,31 @@ public class Plate : MonoBehaviour
     Action onMountComplete;
 
     readonly float animDuration = GameTags.Animation.DOTWEEN_ANIM_DURATION;
-    Vector3 startPos = Vector3.zero;
-    Quaternion startRot = Quaternion.identity;
 
-    public Vector3 offset;
+    Vector3 startLocalPos;
+    public Quaternion startLocalRot;
+    Quaternion visualStartLocalRot;
+    Vector3 visualFollowEuler = new Vector3(90, 90, 0);
+
+    Tween moveTween;
+    bool isReturning;
 
     private void Awake()
     {
-        startPos = transform.position;
-        startRot = transform.rotation;
+        transform.GetLocalPositionAndRotation(out startLocalPos, out startLocalRot);
+        visualStartLocalRot = visual.localRotation;
     }
 
     public void Init(SplineComputer spline, float speed, Turret turret, PlatePoolManager pool, Action onComplete = null)
     {
+        KillTween();
+        isReturning = false;
+
         platePool = pool;
         onMountComplete = onComplete;
         gameObject.SetActive(true);
-        DOTween.Kill(transform);
 
-        transform.DOMove(TurretManager.Instance.GetSplinePosition(), animDuration)
+        moveTween = transform.DOLocalMove(TurretManager.Instance.GetSplinePosition(), animDuration)
             .SetEase(Ease.InOutQuad)
             .OnComplete(() => StartFollowing(spline, speed));
 
@@ -49,18 +55,12 @@ public class Plate : MonoBehaviour
 
     private void StartFollowing(SplineComputer spline, float speed)
     {
-        visual.localRotation = Quaternion.Euler(-90, 90, 0);
+        visual.localRotation = Quaternion.Euler(visualFollowEuler);
         follower.spline = spline;
         follower.SetPercent(0);
         follower.followSpeed = speed;
         follower.onEndReached += OnEnd;
         follower.enabled = true;
-    }
-
-    private void OnValidate()
-    {
-        visual.localRotation = Quaternion.Euler(offset);
-        
     }
 
     private void OnEnd(double percent)
@@ -78,6 +78,11 @@ public class Plate : MonoBehaviour
         ReturnToStart();
     }
 
+    void ResetPose()
+    {
+        transform.SetLocalPositionAndRotation(startLocalPos, startLocalRot);
+    }
+
     public void RecallPlate()
     {
         UnsubscribeTurret();
@@ -92,17 +97,38 @@ public class Plate : MonoBehaviour
 
     void ReturnToStart()
     {
+        if (isReturning) return;
+        isReturning = true;
+
         follower.enabled = false;
         follower.onEndReached -= OnEnd;
         follower.spline = null;
 
-        transform.DOMove(startPos, animDuration)
-            .SetEase(Ease.InOutQuad)
-            .OnComplete(() =>
-            {
-                visual.rotation = startRot;
-                platePool.ReturnPlate(this);
-            });
+        KillTween();
+
+        moveTween = DOTween.Sequence()
+            .Join(transform.DOLocalMove(startLocalPos, animDuration).SetEase(Ease.InOutQuad))
+            .Join(transform.DOLocalRotateQuaternion(startLocalRot, animDuration).SetEase(Ease.InQuad))
+            .SetLink(gameObject)
+                    .OnComplete(() =>
+                    {
+                        ResetPose();
+                        visual.localRotation = visualStartLocalRot;
+                        platePool.ReturnPlate(this);
+                    });
+    }
+
+    void KillTween()
+    {
+        moveTween?.Kill();
+        moveTween = null;
+    }
+
+    void OnDisable()
+    {
+        KillTween();
+        if (follower != null) follower.onEndReached -= OnEnd;
+        UnsubscribeTurret();
     }
 
     void OnTurretStateChanged(TurretState prev, TurretState next)

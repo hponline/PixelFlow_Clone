@@ -67,7 +67,7 @@ public class PlatePoolManager : MonoBehaviour
     }
 
     public void ReturnPlate(Plate plate)
-    {
+    {        
         availablePlates.Add(plate);
         currentPlate++;
         RefreshPositions();
@@ -96,7 +96,7 @@ public class PlatePoolManager : MonoBehaviour
     {
         Plate plate = Instantiate(platePrefab, plateContainer);
         plate.transform.position = GetBuySpawnPoint();
-        plate.transform.rotation = Quaternion.Euler(0,90,0);
+        plate.transform.rotation = plate.startLocalRot;
         plateList.Add(plate);
         availablePlates.Add(plate);
         maxPlate++;
