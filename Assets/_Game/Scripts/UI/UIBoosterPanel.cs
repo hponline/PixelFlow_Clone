@@ -5,6 +5,7 @@ using UnityEngine.UI;
 public class UIBoosterPanel : MonoBehaviour
 {
     [SerializeField] BoosterType boosterType;
+    [SerializeField] CurrencyType currencyType;
     [SerializeField] TextMeshProUGUI amountTxt;
     [SerializeField] TextMeshProUGUI boosterDesp;
     [SerializeField] TextMeshProUGUI boosterAddDesp;
@@ -27,9 +28,9 @@ public class UIBoosterPanel : MonoBehaviour
 
     public void BuyBooster()
     {
-        if (!CoinManager.Instance.HasEnoughCoins(boosterSO.price)) return;
-        CoinManager.Instance.SpendCoins(boosterSO.price);
+        if (!CurrencyManager.Instance.Has(currencyType, boosterSO.price)) return;
 
+        CurrencyManager.Instance.TrySpend(currencyType, boosterSO.price);
         BoosterManager.Instance.AddBooster(boosterType, 1);
         UIManager.Instance.ClosePanel();
     }

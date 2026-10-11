@@ -10,19 +10,21 @@ public class UICoinNumber : MonoBehaviour
 
     private void Start()
     {
-        coinTxt.SetText("{0}", DataManager.Instance.currentCoin);
+        coinTxt.SetText("{0}", CurrencyManager.Instance.Get(CurrencyType.Coin));
         
-        GameEvent.OnCoinChanged += UpdateCoin;
+        CurrencyManager.Instance.OnCurrencyChanged += UpdateCoin;
     }
 
     private void OnDisable()
     {
-        GameEvent.OnCoinChanged -= UpdateCoin;
+        CurrencyManager.Instance.OnCurrencyChanged -= UpdateCoin;
     }
 
-    void UpdateCoin(int amount)
+    void UpdateCoin(CurrencyType type, int amount)
     {
-        coinTxt.SetText("{0}", DataManager.Instance.currentCoin);
+        if (type != CurrencyType.Coin) return;
+
+        coinTxt.SetText("{0}", CurrencyManager.Instance.Get(CurrencyType.Coin));
         UIManager.Instance.PanelPunchAnimation(this.gameObject);
     }
 

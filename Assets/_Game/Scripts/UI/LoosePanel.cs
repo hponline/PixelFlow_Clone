@@ -25,6 +25,6 @@ public class LoosePanel : MonoBehaviour
 
     void SetLevelTxt()
     {
-        levelTxt.SetText("Level {0}", DataManager.Instance.currentLevel);
+        levelTxt.SetText("Level {0}", LevelManager.Instance.CurrentLevel);
     }
 }

@@ -1,3 +1,4 @@
+using NaughtyAttributes;
 using System;
 using UnityEngine;
 
@@ -5,98 +6,120 @@ public class CurrencyManager : MonoBehaviour
 {
     public static CurrencyManager Instance { get; private set; }
 
-    public event Action<int> OnGoldChanged;
-    public event Action<int> OnLivesChanged;
-    public event Action<BoosterType, int> OnBoosterChanged;
+    public event Action<CurrencyType, int> OnCurrencyChanged;
 
-    const string SaveKey = "wallet_v1";
+    const string SaveKey = "currencySaveData";
 
     [Serializable]
     class Data
     {
-        public int gold;
-        public int lives = 5;
-        public int[] boosters = new int[Enum.GetValues(typeof(BoosterType)).Length];
+        public int[] balances = new int[Enum.GetValues(typeof(CurrencyType)).Length];
     }
 
-    Data _d;
+    Data _data;
+    ISaveService _save;
 
-    public int Gold => _d.gold;
-    public int Lives => _d.lives;
-    public int GetBooster(BoosterType t) => _d.boosters[(int)t];
 
     void Awake()
     {
         Instance = this;
+        _save = new PlayerPrefsSaveService();
 
         Load();
     }
 
-    // ---- Gold ----
-    public void AddGold(int amount)
+    public int Get(CurrencyType type) => _data.balances[(int)type];
+    public bool Has(CurrencyType type, int amount) => Get(type) >= amount;
+
+    public void Add(CurrencyType type, int amount)
     {
         if (amount <= 0) return;
-        _d.gold += amount;
-        Save();
-        OnGoldChanged?.Invoke(_d.gold);
+        _data.balances[(int)type] += amount;
+        Commit(type);
     }
 
-    public bool TrySpendGold(int amount)
+    public bool TrySpend(CurrencyType type, int amount)
     {
-        if (amount <= 0 || _d.gold < amount) return false;
-        _d.gold -= amount;
-        Save();
-        OnGoldChanged?.Invoke(_d.gold);
+        if (amount <= 0 || !Has(type, amount)) return false;
+        _data.balances[(int)type] -= amount;
+        Commit(type);
         return true;
     }
 
-    // ---- Lives ----
-    public void AddLives(int amount)
+    void Commit(CurrencyType type)
     {
-        if (amount <= 0) return;
-        _d.lives += amount;
-        Save();
-        OnLivesChanged?.Invoke(_d.lives);
+        _save.Save(SaveKey, _data);
+        OnCurrencyChanged?.Invoke(type, Get(type));
     }
 
-    public bool TryConsumeLife()
-    {
-        if (_d.lives <= 0) return false;
-        _d.lives--;
-        Save();
-        OnLivesChanged?.Invoke(_d.lives);
-        return true;
-    }
+    //// ---- Gold ----
+    //public void AddGold(int amount)
+    //{
+    //    if (amount <= 0) return;
+    //    _data.gold += amount;
+    //    Save();
+    //    OnGoldChanged?.Invoke(_data.gold);
+    //}
 
-    // ---- Boosters ----
-    public void AddBooster(BoosterType t, int amount)
-    {
-        if (amount <= 0) return;
-        _d.boosters[(int)t] += amount;
-        Save();
-        OnBoosterChanged?.Invoke(t, _d.boosters[(int)t]);
-    }
+    //public bool TrySpendGold(int amount)
+    //{
+    //    if (amount <= 0 || _data.gold < amount) return false;
+    //    _data.gold -= amount;
+    //    Save();
+    //    OnGoldChanged?.Invoke(_data.gold);
+    //    return true;
+    //}
 
-    public bool TryConsumeBooster(BoosterType t)
-    {
-        if (_d.boosters[(int)t] <= 0) return false;
-        _d.boosters[(int)t]--;
-        Save();
-        OnBoosterChanged?.Invoke(t, _d.boosters[(int)t]);
-        return true;
-    }
+    //// ---- Lives ----
+    //public void AddLives(int amount)
+    //{
+    //    if (amount <= 0) return;
+    //    _data.lives += amount;
+    //    Save();
+    //    OnLivesChanged?.Invoke(_data.lives);
+    //}
 
-    // ---- Persistence ----
-    // Prototip icin PlayerPrefs. Sonra ISaveService arkasina tasi (dosya / cloud save).
+    //public bool TryConsumeLife()
+    //{
+    //    if (_data.lives <= 0) return false;
+    //    _data.lives--;
+    //    Save();
+    //    OnLivesChanged?.Invoke(_data.lives);
+    //    return true;
+    //}
+
+    //// ---- Boosters ----
+    //public void AddBooster(BoosterType t, int amount)
+    //{
+    //    if (amount <= 0) return;
+    //    _data.boosters[(int)t] += amount;
+    //    Save();
+    //    OnBoosterChanged?.Invoke(t, _data.boosters[(int)t]);
+    //}
+
+    //public bool TryConsumeBooster(BoosterType t)
+    //{
+    //    if (_data.boosters[(int)t] <= 0) return false;
+    //    _data.boosters[(int)t]--;
+    //    Save();
+    //    OnBoosterChanged?.Invoke(t, _data.boosters[(int)t]);
+    //    return true;
+    //}
+
     void Load()
     {
+        _data = _save.Load<Data>(SaveKey);
+        
+        int count = Enum.GetValues(typeof(CurrencyType)).Length;
+        if (_data.balances == null)
+            _data.balances = new int[count];
+        else if (_data.balances.Length != count)
+            Array.Resize(ref _data.balances, count); // Yeni eleman eklenince bozulmamasý için
+
         var json = PlayerPrefs.GetString(SaveKey, null);
-        _d = string.IsNullOrEmpty(json) ? new Data() : JsonUtility.FromJson<Data>(json);
+        _data = string.IsNullOrEmpty(json) ? new Data() : JsonUtility.FromJson<Data>(json);
     }
 
-    void Save()
-    {
-        PlayerPrefs.SetString(SaveKey, JsonUtility.ToJson(_d));
-        PlayerPrefs.Save();
-    }
+    [Button]
+    void DebugAddCoin() => Add(CurrencyType.Coin, 5000);
 }

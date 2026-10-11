@@ -30,10 +30,12 @@ public class ShopManager : MonoBehaviour
         if (!_byId.TryGetValue(productId, out var pack)) return;
 
         var wallet = CurrencyManager.Instance;
-        wallet.AddGold(pack.gold);
-        wallet.AddLives(pack.lives);
-        foreach (var b in pack.boosters)
-            wallet.AddBooster(b.type, b.amount);
+        var life = LifeManager.Instance;
+
+        wallet.Add(CurrencyType.Coin, pack.gold);
+        life.Add(pack.lives);
+        //foreach (var b in pack.boosters)
+            //wallet.Add(b.type, b.amount); // booster
 
         // Analytics: purchase eventi buradan loglanir (Firebase "purchase").
     }

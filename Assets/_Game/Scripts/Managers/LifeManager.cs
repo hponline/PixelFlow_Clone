@@ -29,6 +29,13 @@ public class LifeManager : MonoBehaviour
     public event Action OnUnlimitedLivesExpired;
 
 
+    [Header("PlayerPrefs")]
+
+    const string KEYS_UNLIMITED_LIVES_EXPIRY = "UnlimitedLivesExpiry";
+    const string KEYS_CURRENT_LIFE = "CurrentLife";
+    const string KEYS_NEXT_LIFE_TIME = "NextLifeTime";
+
+
     void Awake()
     {
         Instance = this;
@@ -36,12 +43,8 @@ public class LifeManager : MonoBehaviour
         LoadData();
         ApplyOfflineUnlimitedExpiry();
         ApplyOfflineRegen();
-    }
 
-    void Start()
-    {
         _wasUnlimited = IsUnLimitedLives;
-
         GameEvent.OnLevelRestart += OnConsumeLife;
     }
 
@@ -85,7 +88,7 @@ public class LifeManager : MonoBehaviour
     [Button]
     public void TestAddCurrentLife()
     {
-        BuyLife(1);
+        Add(1);
     }
 
     // ── Sınırsız Can ──────────────────────────────────────────────────────────
@@ -102,7 +105,7 @@ public class LifeManager : MonoBehaviour
 
     }
 
-    public void BuyLife(int amount)
+    public void Add(int amount)
     {
         currentLife = Mathf.Min(currentLife + amount, 99);
 
@@ -162,25 +165,20 @@ public class LifeManager : MonoBehaviour
         OnLifeChanged?.Invoke(currentLife);
     }
 
-    public void ResetLife()
-    {
-        currentLife = MaxLife;
-    }
-
     private void SaveData()
     {
-        PlayerPrefs.SetInt(GameTags.PlayerPrefsKeys.CURRENT_LIFE, currentLife);
-        PlayerPrefs.SetString(GameTags.PlayerPrefsKeys.NEXT_LIFE_TIME, nextLifeTime.ToBinary().ToString());
-        PlayerPrefs.SetString(GameTags.PlayerPrefsKeys.UNLIMITED_LIVES_EXPIRY, _unlimitedLivesExpiry.ToBinary().ToString());
+        PlayerPrefs.SetInt(KEYS_CURRENT_LIFE, currentLife);
+        PlayerPrefs.SetString(KEYS_NEXT_LIFE_TIME, nextLifeTime.ToBinary().ToString());
+        PlayerPrefs.SetString(KEYS_UNLIMITED_LIVES_EXPIRY, _unlimitedLivesExpiry.ToBinary().ToString());
         PlayerPrefs.Save();
     }
 
     private void LoadData()
     {
-        currentLife = PlayerPrefs.GetInt(GameTags.PlayerPrefsKeys.CURRENT_LIFE, MaxLife);
+        currentLife = PlayerPrefs.GetInt(KEYS_CURRENT_LIFE, MaxLife);
 
-        if (PlayerPrefs.HasKey(GameTags.PlayerPrefsKeys.NEXT_LIFE_TIME) &&
-            long.TryParse(PlayerPrefs.GetString(GameTags.PlayerPrefsKeys.NEXT_LIFE_TIME), out long binary))
+        if (PlayerPrefs.HasKey(KEYS_NEXT_LIFE_TIME) &&
+            long.TryParse(PlayerPrefs.GetString(KEYS_NEXT_LIFE_TIME), out long binary))
         {
             nextLifeTime = DateTime.FromBinary(binary);
         }
@@ -190,8 +188,8 @@ public class LifeManager : MonoBehaviour
             nextLifeTime = DateTime.UtcNow.AddSeconds(RegenDurationSeconds);
         }
 
-        if (PlayerPrefs.HasKey(GameTags.PlayerPrefsKeys.UNLIMITED_LIVES_EXPIRY) &&
-            long.TryParse(PlayerPrefs.GetString(GameTags.PlayerPrefsKeys.UNLIMITED_LIVES_EXPIRY), out long unlimitedBinary))
+        if (PlayerPrefs.HasKey(KEYS_UNLIMITED_LIVES_EXPIRY) &&
+            long.TryParse(PlayerPrefs.GetString(KEYS_UNLIMITED_LIVES_EXPIRY), out long unlimitedBinary))
         {
             _unlimitedLivesExpiry = DateTime.FromBinary(unlimitedBinary);
         }

@@ -15,7 +15,9 @@ public class LevelManager : MonoBehaviour
     public LevelList levelList;
     [SerializeField] int _TestCurrentLevel = 0;
     [SerializeField] int maxLevel = 0;
+    [SerializeField] int currentLevel;
     public int MaxLevel => maxLevel;
+    public int CurrentLevel => currentLevel;
 
     [SerializeField] Block[,] grid;
     public Grid gridComponent;
@@ -34,9 +36,14 @@ public class LevelManager : MonoBehaviour
     [Header("Test")]
     [SerializeField] bool Test = false;
 
+    [Header("PlayerPrefs")]
+    const string KEYS_CURRENT_LEVEL = "currentLevel";
+
     private void Awake()
     {
         Instance = this;
+
+        Setup();
     }
 
     private void OnEnable()
@@ -59,21 +66,26 @@ public class LevelManager : MonoBehaviour
         if (Test)
             LoadLevel(_TestCurrentLevel);  
         else    
-            LoadLevel(DataManager.Instance.currentLevel);
+            LoadLevel(currentLevel);
 
         CheckMaxLevel();
     }
 
+    void Setup()
+    {
+        currentLevel = PlayerPrefs.GetInt(KEYS_CURRENT_LEVEL, 0);
+    }
+
     void OnCheckLevel()
     {
-        BoosterManager.Instance.CheckLevelUnlocks(DataManager.Instance.currentLevel +1);
+        BoosterManager.Instance.CheckLevelUnlocks(currentLevel +1);
     }
 
     void CompleteLevel()
     {
-        int completedLvl = DataManager.Instance.currentLevel;
+        int completedLvl = currentLevel;
 
-        DataManager.Instance.SaveLevel(completedLvl);
+        SaveLevel(completedLvl);
         Debug.Log("Level Win");
         GameEvent.TriggerLevelCompleted();
     }
@@ -100,7 +112,7 @@ public class LevelManager : MonoBehaviour
 
     public void NextLevel()
     {
-        int nextLevel = DataManager.Instance.NextLevel;
+        int nextLevel = currentLevel + 1;
         transitionScreen.ToggleTransitionScreen();
 
         LoadLevel(nextLevel);
@@ -108,7 +120,7 @@ public class LevelManager : MonoBehaviour
         GameEvent.TriggerLevelChanged(nextLevel);
         UIManager.Instance.ClosePanel();
         
-        DataManager.Instance.SaveLevel(nextLevel);
+        SaveLevel(nextLevel);
     }
 
     public void LoadLevel(int levelIndex)
@@ -246,6 +258,13 @@ public class LevelManager : MonoBehaviour
 
             link.Link(target);
         }
+    }
+
+    public void SaveLevel(int level)
+    {
+        currentLevel = level;
+        PlayerPrefs.SetInt(KEYS_CURRENT_LEVEL, currentLevel);
+        PlayerPrefs.Save();
     }
 
     //void ClearLevel() // Her level yüklediginde sahne reseti

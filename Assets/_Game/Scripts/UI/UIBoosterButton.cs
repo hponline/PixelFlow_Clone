@@ -73,9 +73,9 @@ public class UIBoosterButton : MonoBehaviour
 
     private void RefreshVisual()
     {
-        var data = BoosterManager.Instance.GetData(boosterType);
-        bool isUnlocked = BoosterManager.Instance.IsUnlocked(boosterType);
-        bool hasBooster = data.count> 0;
+        var boosterData = BoosterManager.Instance;
+        bool isUnlocked = boosterData.IsUnlocked(boosterType);
+        bool hasBooster = boosterData.Has(boosterType);
 
         lockedOverlay?.SetActive(!isUnlocked);
         lockTxtLvlInfo.SetText("Lv {0}", boosterSO.unlockLevel);
@@ -84,7 +84,7 @@ public class UIBoosterButton : MonoBehaviour
         boosterCount?.gameObject.SetActive(isUnlocked && hasBooster);
 
         if (isUnlocked && hasBooster)
-            boosterCount.SetText("{0}", data.count);
+            boosterCount.SetText("{0}", boosterData.GetCount(boosterType));
     }
 
     void ButtonPunchAnim()
@@ -100,7 +100,7 @@ public class UIBoosterButton : MonoBehaviour
             return;
         }
 
-        int count = BoosterManager.Instance.GetData(boosterType).count;
+        int count = BoosterManager.Instance.GetCount(boosterType);
         if (count <= 0)
         {
             ShowBuyPanel();

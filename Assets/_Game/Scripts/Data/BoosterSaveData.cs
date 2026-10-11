@@ -6,6 +6,7 @@ public class BoosterSaveData
 {
     public BoosterType type;
     public int count;
+    public int startCount = 3;
     public bool hasBeenUnlockedOnce; // ilk kazaným flag'i
     public bool isLevelUnlocked;
 }

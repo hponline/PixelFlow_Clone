@@ -13,60 +13,64 @@ public class BoosterManager : MonoBehaviour
     public event Action<BoosterType> OnBoosterFirstUnlocked;
     public event Action<BoosterType> OnBoosterLevelUnlocked;
 
-    private Dictionary<BoosterType, BoosterSaveData> boosterData = new Dictionary<BoosterType, BoosterSaveData>();
+    readonly Dictionary<BoosterType, BoosterSaveData> boosterData = new Dictionary<BoosterType, BoosterSaveData>();
+    ISaveService _save;
+
+    [Header("PlayerPrefs")]
+    const string KEYS_BOOSTERS = "boosters";
 
     private void Awake()
     {
         Instance = this;
+
+        _save = new PlayerPrefsSaveService();
         Load();
     }
 
-    public bool IsUnlocked(BoosterType type) => GetData(type).isLevelUnlocked;
+    public int GetCount(BoosterType type) => boosterData.TryGetValue(type, out var data) ? data.count : 0;
+    public bool IsUnlocked(BoosterType type) => boosterData.TryGetValue(type, out var data) && data.isLevelUnlocked;
+    public bool Has(BoosterType type) => GetCount(type) > 0;
+
 
     public void CheckLevelUnlocks(int currentLevel)
     {
+        bool changed = false;
         foreach (var so in allBoosters)
         {
-            var data = GetData(so.boosterType);
-            if (!data.isLevelUnlocked && currentLevel >= so.unlockLevel)
-            {
-                data.isLevelUnlocked = true;
-                if(data.count <= 0)
-                    data.count = 3;
-                OnBoosterLevelUnlocked?.Invoke(so.boosterType);
-                Debug.LogWarning("Booster Unlock: " + so.boosterType.ToString());
-            }
+            var data = GetOrCreate(so.boosterType);
+            if (data.isLevelUnlocked || currentLevel < so.unlockLevel) continue;
+
+            data.isLevelUnlocked = true;
+            if (data.count <= 0)
+                data.count = so.startCount;
+
+            changed = true;
+            OnBoosterCountChanged?.Invoke(so.boosterType, data.count);
+            OnBoosterLevelUnlocked?.Invoke(so.boosterType);
+            Debug.LogWarning("Booster Unlock: " + so.boosterType.ToString());
         }
-        Save();
-    }
 
-    public BoosterSaveData GetData(BoosterType type)
-    {
-        if (!boosterData.ContainsKey(type))
-            boosterData[type] = new BoosterSaveData { type = type, count = 3, hasBeenUnlockedOnce = false, isLevelUnlocked = false };
-
-        return boosterData[type];
+        if (changed)
+            Save();
     }
 
     public void AddBooster(BoosterType type, int amount)
     {
-        var data = GetData(type);
+        var data = GetOrCreate(type);
         bool isFirstUnlock = !data.hasBeenUnlockedOnce; // sadece ilk açýldýgýnda parlama efekti olacak
-        data.count += amount;
-        if (isFirstUnlock)
-            data.hasBeenUnlockedOnce = true;
 
-        Save();
+        data.count += amount;
+        data.hasBeenUnlockedOnce = true;
 
         OnBoosterCountChanged?.Invoke(type, data.count);
+        Save();
         if (isFirstUnlock)
             OnBoosterFirstUnlocked?.Invoke(type);
     }
 
     public bool TryUseBooster(BoosterType type)
     {
-        var data = GetData(type);
-        if (data.count <= 0) return false;
+        if (!boosterData.TryGetValue(type, out var data) || data.count <= 0) return false;
 
         data.count--;
         Save();
@@ -74,18 +78,26 @@ public class BoosterManager : MonoBehaviour
         return true;
     }
 
-    private void Save()
+    BoosterSaveData GetOrCreate(BoosterType type)
     {
-        var wrapper = new BoosterSaveWrapper { boosters = new List<BoosterSaveData>(boosterData.Values) };
-        PlayerPrefs.SetString(GameTags.Booster.BOOSTER_SAVE_DATA, JsonUtility.ToJson(wrapper));
-        PlayerPrefs.Save();
+        if (!boosterData.TryGetValue(type, out var data))
+            boosterData[type] = data = new BoosterSaveData { type = type };
+        return data;
     }
 
-    private void Load()
+    void Save()
     {
-        if (!PlayerPrefs.HasKey(GameTags.Booster.BOOSTER_SAVE_DATA)) return;
+        _save.Save(KEYS_BOOSTERS, new BoosterSaveWrapper
+        {
+            boosters = new List<BoosterSaveData>(boosterData.Values)
+        });
+    }
 
-        var wrapper = JsonUtility.FromJson<BoosterSaveWrapper>(PlayerPrefs.GetString(GameTags.Booster.BOOSTER_SAVE_DATA));
+    void Load()
+    {
+        var wrapper = _save.Load<BoosterSaveWrapper>(KEYS_BOOSTERS);
+        if (wrapper.boosters == null || wrapper.boosters.Count == 0) return;
+
         foreach (var b in wrapper.boosters)
             boosterData[b.type] = b;
     }

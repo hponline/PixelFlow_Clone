@@ -5,6 +5,7 @@ public abstract class BoosterSO : ScriptableObject
     public BoosterType boosterType;
     public int price = 300;
     public int unlockLevel = 1;
+    public int startCount = 3;
     public Sprite BoosterIcon;
     public string BoosterAddDescription;
     public string BoosterDescription;

@@ -7,19 +7,8 @@ public class GameManager : MonoBehaviour
 {
     public static GameManager Instance;
 
-    [SerializeField] int maxLife;
-    [SerializeField] int currentLife;
-
-    public bool HasEnoughLife() => currentLife > 0;
-    public int CurrentLife => currentLife;
-
     private void Awake()
     {
-        if (Instance != null && Instance != this)
-        {
-            Destroy(gameObject);
-            return;
-        }
         Instance = this;
 
         Setup();
@@ -27,29 +16,26 @@ public class GameManager : MonoBehaviour
 
     void Setup()
     {
-        currentLife = LifeManager.Instance.CurrentLife;
+        //
     }
 
     [Button]
     public void SpendLife()
     {
-        currentLife--;
-        GameEvent.TriggerLivesChanged(currentLife);
+        //LifeManager.Instance.o(CurrencyType.Life, 1);
 
-        if (!HasEnoughLife())
-        {
+        if (!CurrencyManager.Instance.Has(CurrencyType.Coin, 0))
             GameEvent.TriggerGameLose();
-        }
     }
 
     public void RestartGame()
     {
-        if (!HasEnoughLife()) return;
+        if (!LifeManager.Instance.HasEnoughLife()) return;
 
-        GameEvent.TriggerGameRestart();
-        GameEvent.TriggerLevelRestart();
+        GameEvent.TriggerGameRestart(); // ??
+        GameEvent.TriggerLevelRestart(); 
         SceneManager.LoadScene(0); // tek sahne olursa burasý kalkacak
 
-        Debug.Log("Restart Game");
+        Debug.Log("Restart Game tek sahne olursa burasý kalkacak");
     }
 }
