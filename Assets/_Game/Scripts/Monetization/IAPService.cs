@@ -1,19 +1,18 @@
 using System;
 using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Purchasing;
 using UnityEngine.Purchasing.Extension;
 
 // Unity IAP 4.x (IDetailedStoreListener). Paket surumun 5.x ise StoreController API'si
-// farkli; sadece bu sinifi degistirmen yeterli, geri kalan kod etkilenmez.
 public class IAPService : IDetailedStoreListener
 {
     IStoreController _controller;
 
     public bool IsReady => _controller != null;
-    public event Action<string> OnPurchaseSucceeded; // productId
+    public event Action<string, decimal, string, string> OnPurchaseSucceeded; // productId
     public event Action<string, string> OnPurchaseFailed; // productId, reason
+    public event Action OnReady;
 
     public void Initialize(IEnumerable<string> consumableProductIds)
     {
@@ -38,7 +37,10 @@ public class IAPService : IDetailedStoreListener
 
     // ---- IStoreListener ----
     public void OnInitialized(IStoreController controller, IExtensionProvider extensions)
-        => _controller = controller;
+    {
+        _controller = controller;
+        OnReady?.Invoke();
+    }
 
     public void OnInitializeFailed(InitializationFailureReason error)
         => Debug.LogError($"IAP init failed: {error}");
@@ -48,27 +50,26 @@ public class IAPService : IDetailedStoreListener
 
     public PurchaseProcessingResult ProcessPurchase(PurchaseEventArgs args)
     {
-        // Odul verme senkron ve lokal oldugu icin Complete donmek guvenli.
-        // Sunucu dogrulamasi eklersen Pending don, dogrulayinca ConfirmPendingPurchase cagir.
-        OnPurchaseSucceeded?.Invoke(args.purchasedProduct.definition.id);
+        var p = args.purchasedProduct;
+        OnPurchaseSucceeded?.Invoke(
+            p.definition.id,
+            p.metadata.localizedPrice,
+            p.metadata.isoCurrencyCode,
+            p.transactionID);
+
         return PurchaseProcessingResult.Complete;
     }
 
-    void IDetailedStoreListener.OnPurchaseFailed(UnityEngine.Purchasing.Product product, PurchaseFailureDescription failureDescription)
+    void IDetailedStoreListener.OnPurchaseFailed(Product product, PurchaseFailureDescription failureDescription)
     {
-        Debug.LogError("Satýn alma baþarýsýz");
-        throw new NotImplementedException();
+        OnPurchaseFailed?.Invoke(product?.definition.id, failureDescription.reason.ToString());
+
+        Debug.Log("Satýn alma baþarýsýz1");
     }
 
-    void IStoreListener.OnPurchaseFailed(UnityEngine.Purchasing.Product product, PurchaseFailureReason failureReason)
+    void IStoreListener.OnPurchaseFailed(Product product, PurchaseFailureReason failureReason)
     {
-        Debug.LogError("Satýn alma baþarýsýz");
-        throw new NotImplementedException();
+        OnPurchaseFailed?.Invoke(product?.definition.id, failureReason.ToString());
+        Debug.Log("Satýn alma baþarýsýz2");
     }
-
-    //public void OnPurchaseFailed(Product product, PurchaseFailureReason reason)
-    //    => OnPurchaseFailed?.Invoke(product.definition.id, reason.ToString());
-
-    //public void OnPurchaseFailed(Product product, PurchaseFailureDescription description)
-    //    => OnPurchaseFailed?.Invoke(product.definition.id, description.reason.ToString());
 }

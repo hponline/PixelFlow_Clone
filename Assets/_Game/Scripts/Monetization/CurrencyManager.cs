@@ -52,72 +52,15 @@ public class CurrencyManager : MonoBehaviour
         OnCurrencyChanged?.Invoke(type, Get(type));
     }
 
-    //// ---- Gold ----
-    //public void AddGold(int amount)
-    //{
-    //    if (amount <= 0) return;
-    //    _data.gold += amount;
-    //    Save();
-    //    OnGoldChanged?.Invoke(_data.gold);
-    //}
-
-    //public bool TrySpendGold(int amount)
-    //{
-    //    if (amount <= 0 || _data.gold < amount) return false;
-    //    _data.gold -= amount;
-    //    Save();
-    //    OnGoldChanged?.Invoke(_data.gold);
-    //    return true;
-    //}
-
-    //// ---- Lives ----
-    //public void AddLives(int amount)
-    //{
-    //    if (amount <= 0) return;
-    //    _data.lives += amount;
-    //    Save();
-    //    OnLivesChanged?.Invoke(_data.lives);
-    //}
-
-    //public bool TryConsumeLife()
-    //{
-    //    if (_data.lives <= 0) return false;
-    //    _data.lives--;
-    //    Save();
-    //    OnLivesChanged?.Invoke(_data.lives);
-    //    return true;
-    //}
-
-    //// ---- Boosters ----
-    //public void AddBooster(BoosterType t, int amount)
-    //{
-    //    if (amount <= 0) return;
-    //    _data.boosters[(int)t] += amount;
-    //    Save();
-    //    OnBoosterChanged?.Invoke(t, _data.boosters[(int)t]);
-    //}
-
-    //public bool TryConsumeBooster(BoosterType t)
-    //{
-    //    if (_data.boosters[(int)t] <= 0) return false;
-    //    _data.boosters[(int)t]--;
-    //    Save();
-    //    OnBoosterChanged?.Invoke(t, _data.boosters[(int)t]);
-    //    return true;
-    //}
-
     void Load()
     {
-        _data = _save.Load<Data>(SaveKey);
+        _data = _save.Load<Data>(SaveKey) ?? new Data();
         
         int count = Enum.GetValues(typeof(CurrencyType)).Length;
         if (_data.balances == null)
             _data.balances = new int[count];
         else if (_data.balances.Length != count)
             Array.Resize(ref _data.balances, count); // Yeni eleman eklenince bozulmamasý için
-
-        var json = PlayerPrefs.GetString(SaveKey, null);
-        _data = string.IsNullOrEmpty(json) ? new Data() : JsonUtility.FromJson<Data>(json);
     }
 
     [Button]
